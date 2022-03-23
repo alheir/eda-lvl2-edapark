@@ -19,29 +19,23 @@ using namespace std;
 
 #include "MQTTClient.h"
 
+float charVectorToFloat(std::vector<char>& vector)
+{
+    void *pt = vector.data();
+    return (*(float *)pt);
+}
+
+std::vector<char> floatToCharVector(float data)
+{
+    std::vector<char> vector;
+    vector.reserve(sizeof(data));
+    std::memcpy(vector.data(), &data, sizeof(data));
+
+    return vector;
+}
+
 int main()
 {
-
-    std::vector<char> payload;
-    payload.reserve(sizeof(float));
-
-    float val = -15.23E23;
-
-    std::memcpy(payload.data(), &val, sizeof(float));
-
-    for(auto x : payload)
-    {
-        cout << x << endl;
-    }
-
-    void *pt = payload.data();
-
-    float test = *(float*)pt;
-
-    cout << test << endl;
-
-
-    /*
     std::vector<MQTTMessage> msg;
 
     MQTTClient client("controller");
@@ -51,16 +45,34 @@ int main()
         cout << "Conectado..." << endl;
     }
 
-    if (!client.subscribe("robot1/power/powerConsumption"))
+    if (!client.subscribe("robot1/power/batteryLevel"))
     {
         cout << "error subscribing" << endl;
     }
+
+
 
     while (getchar())
     {
         cout << "looping" << endl;
 
+        std::vector<char> payload = floatToCharVector(10.0f);
+
+        if(!client.publish("robot1/motor2/current/set", payload));
+            cout << "error";
+
+        while(getchar())
+        {
+            std:vector<MQTTMessage> msg = client.getMessages();
+
+            for(auto x : msg)
+            {
+                cout << x.topic << " ~ valor:";
+                cout << charVectorToFloat(x.payload) << endl;
+            }
+
+        }
 
     }
-    */
+    
 }
