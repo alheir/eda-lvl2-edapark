@@ -17,6 +17,7 @@
 
 using namespace std;
 
+<<<<<<< HEAD
 #include <raylib-cpp.hpp>
 #include "controllerEDAbot.h"
 
@@ -71,6 +72,13 @@ std::vector<char> floatToCharVector(float data)
     std::memcpy(vector.data(), &data, sizeof(data));
     return vector;
 }
+=======
+#include "MQTTClient.h"
+#include "controllerEDAbot.h"
+
+
+
+>>>>>>> 90337eb (Intento de mover)
 
 /**
  * @brief
@@ -85,15 +93,22 @@ void changeMotorVoltage(float m1, float m2, float m3, float m4, MQTTClient &clie
 
 int main()
 {
+<<<<<<< HEAD
     controllerEDAbot controller;
 
     int screenWidth = 800;
     int screenHeight = 450;
     raylib::Color textColor = raylib::Color::LightGray();
     raylib::Window window(screenWidth, screenHeight, "raylib [core] example - basic window");
+=======
+    std::vector<MQTTMessage> msg;
+    controllerEDAbot control;
+    MQTTClient client("controller");
+>>>>>>> 90337eb (Intento de mover)
 
     SetTargetFPS(60);
 
+<<<<<<< HEAD
     // Main game loop
     while (!window.ShouldClose())
     { // Detect window close button or ESC key
@@ -102,6 +117,43 @@ int main()
         if (IsKeyDown(KEY_RIGHT))
         {
             DrawText("key right", 0, 0, 14, GOLD);
+=======
+    //if (!client.subscribe("robot1/power/batteryLevel"))
+    //{
+        //cout << "error subscribing" << endl;
+    //}
+    
+    if (!client.subscribe("robot1/motor1/current"))
+        cout << "error m1" << endl;
+
+    
+    if (!client.subscribe("robot1/motor2/current"))
+        cout << "error m2" << endl;
+
+    
+    if (!client.subscribe("robot1/motor3/current"))
+        cout << "error m3" << endl;
+
+
+    if (!client.subscribe("robot1/motor4/current"))
+        cout << "error m4" << endl;
+
+
+
+    while (getchar())
+    {
+
+        cout << "looping" << endl;
+       
+
+        std:vector<MQTTMessage> msg = client.getMessages();
+
+        for(auto x : msg)
+        {
+
+            cout << x.topic << " ~ valor:";
+            cout << charVectorToFloat(x.payload) << endl;
+>>>>>>> 90337eb (Intento de mover)
         }
 
         if (IsKeyDown(KEY_LEFT))

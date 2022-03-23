@@ -17,7 +17,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 
-add_executable(${PROJECT_NAME} main.cpp MQTTClient.cpp)
+add_executable(${PROJECT_NAME} main.cpp MQTTClient.cpp controllerEDAbot.cpp)
 
 # Packages
 find_package(raylib CONFIG REQUIRED)
