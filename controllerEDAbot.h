@@ -25,6 +25,13 @@ private:
 class controllerEDAbot
 {
 public:
+    void moveForward();
+    void moveBackward();
+    void moveRight();
+    void moveLeft();
+    void rotateRight();
+    void rotateLeft();
+    void stop();
 
 private:
     float batteryLevel;

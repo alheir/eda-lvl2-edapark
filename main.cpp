@@ -12,6 +12,8 @@
 #include <iostream>
 #include <vector>
 #include <stdio.h>
+#include <stdlib.h>
+#include <cstring>
 
 using namespace std;
 
@@ -20,6 +22,26 @@ using namespace std;
 int main()
 {
 
+    std::vector<char> payload;
+    payload.reserve(sizeof(float));
+
+    float val = -15.23E23;
+
+    std::memcpy(payload.data(), &val, sizeof(float));
+
+    for(auto x : payload)
+    {
+        cout << x << endl;
+    }
+
+    void *pt = payload.data();
+
+    float test = *(float*)pt;
+
+    cout << test << endl;
+
+
+    /*
     std::vector<MQTTMessage> msg;
 
     MQTTClient client("controller");
@@ -38,6 +60,7 @@ int main()
     {
         cout << "looping" << endl;
 
-            
+
     }
+    */
 }
