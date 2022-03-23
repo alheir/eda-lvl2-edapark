@@ -17,9 +17,48 @@
 
 using namespace std;
 
-#include "MQTTClient.h"
+#include <raylib-cpp.hpp>
+#include "controllerEDAbot.h"
 
-float charVectorToFloat(std::vector<char>& vector)
+const std::string writingTopics[] =
+    {
+        "robot1/power/powerConsumption",
+        "robot1/power/batteryLevel",
+        "robot1/motor1/voltage/set",
+        "robot1/motor2/voltage/set",
+        "robot1/motor3/voltage/set",
+        "robot1/motor4/voltage/set",
+        "robot1/motor1/current/set",
+        "robot1/motor2/current/set",
+        "robot1/motor3/current/set",
+        "robot1/motor4/current/set"};
+
+const std::string readingTopics[] =
+    {
+        "robot1/power/powerConsumption",
+        "robot1/power/batteryLevel",
+        "robot1/motor1/voltage",
+        "robot1/motor2/voltage",
+        "robot1/motor3/voltage",
+        "robot1/motor4/voltage",
+        "robot1/motor1/current",
+        "robot1/motor2/current",
+        "robot1/motor3/current",
+        "robot1/motor4/current",
+        "robot1/motor1/rpm",
+        "robot1/motor2/rpm",
+        "robot1/motor3/rpm",
+        "robot1/motor4/rpm",
+        "robot1/motor1/temperature",
+        "robot1/motor2/temperature",
+        "robot1/motor3/temperature",
+        "robot1/motor4/temperature",
+        "robot1/motor1/temperature",
+        "robot1/motor2/temperature",
+        "robot1/motor3/temperature",
+        "robot1/motor4/temperature"};
+
+float charVectorToFloat(std::vector<char> &vector)
 {
     void *pt = vector.data();
     return (*(float *)pt);
@@ -28,51 +67,109 @@ float charVectorToFloat(std::vector<char>& vector)
 std::vector<char> floatToCharVector(float data)
 {
     std::vector<char> vector;
-    vector.reserve(sizeof(data));
+    vector.resize(sizeof(data));
     std::memcpy(vector.data(), &data, sizeof(data));
-
     return vector;
 }
 
+/**
+ * @brief
+ *
+ * @param m1
+ * @param m2
+ * @param m3
+ * @param m4
+ * @param client
+ */
+void changeMotorVoltage(float m1, float m2, float m3, float m4, MQTTClient &client);
+
 int main()
 {
-    std::vector<MQTTMessage> msg;
+    controllerEDAbot controller;
 
-    MQTTClient client("controller");
+    int screenWidth = 800;
+    int screenHeight = 450;
+    raylib::Color textColor = raylib::Color::LightGray();
+    raylib::Window window(screenWidth, screenHeight, "raylib [core] example - basic window");
 
-    if (client.connect("127.0.0.1", 1883, "user", "vdivEMMN3SQWX2Ez"))
-    {
-        cout << "Conectado..." << endl;
-    }
+    SetTargetFPS(60);
 
-    if (!client.subscribe("robot1/power/batteryLevel"))
-    {
-        cout << "error subscribing" << endl;
-    }
-
-
-
-    while (getchar())
-    {
-        cout << "looping" << endl;
-
-        std::vector<char> payload = floatToCharVector(10.0f);
-
-        if(!client.publish("robot1/motor2/current/set", payload));
-            cout << "error";
-
-        while(getchar())
+    // Main game loop
+    while (!window.ShouldClose())
+    { // Detect window close button or ESC key
+      // Update
+      //----------------------------------------------------------------------------------
+        if (IsKeyDown(KEY_RIGHT))
         {
-            std:vector<MQTTMessage> msg = client.getMessages();
-
-            for(auto x : msg)
-            {
-                cout << x.topic << " ~ valor:";
-                cout << charVectorToFloat(x.payload) << endl;
-            }
-
+            DrawText("key right", 0, 0, 14, GOLD);
         }
 
+        if (IsKeyDown(KEY_LEFT))
+        {
+            DrawText("key left", 0, 0, 14, GOLD);
+        }
+
+        if (IsKeyDown(KEY_UP))
+        {
+            DrawText("key up", 0, 0, 14, GOLD);
+        }
+
+        if (IsKeyDown(KEY_DOWN))
+        {
+            DrawText("key down", 0, 0, 14, GOLD);
+        }
+
+        if (IsKeyDown(KEY_ENTER))
+        {
+            DrawText("key enter", 0, 0, 14, GOLD);
+
+           // std::vector<MQTTMessage> msg = client.getMessages();
+/*
+            int i = 0;
+            for (auto x : msg)
+            {
+                for (int i = 0; i < sizeof(readingTopics) / sizeof(readingTopics[0]); i++)
+                {
+                    if (!x.topic.compare(readingTopics[i]))
+                    {
+                        DrawText(readingTopics[i].data(), 0, 10 * (i + 1), 12, GOLD);
+                        DrawText(std::to_string(charVectorToFloat(x.payload)).data(), 70, 10 * (i + 1), 12, GOLD);
+                    }
+                }
+            }*/
+        }
+
+        //----------------------------------------------------------------------------------
+
+        // Draw
+        //----------------------------------------------------------------------------------
+        BeginDrawing();
+        {
+            window.ClearBackground(BLACK);
+        }
+        EndDrawing();
+        //----------------------------------------------------------------------------------
     }
-    
+
+}
+
+void changeMotorVoltage(float m1, float m2, float m3, float m4, MQTTClient &client)
+{
+    std::vector<char> payload;
+
+    payload = floatToCharVector(m1);
+    if (!client.publish("robot1/motor1/voltage/set", payload))
+        cout << "error m1" << endl;
+
+    payload = floatToCharVector(m2);
+    if (!client.publish("robot1/motor2/voltage/set", payload))
+        cout << "error m2" << endl;
+
+    payload = floatToCharVector(m3);
+    if (!client.publish("robot1/motor3/voltage/set", payload))
+        cout << "error m3" << endl;
+
+    payload = floatToCharVector(m4);
+    if (!client.publish("robot1/motor4/voltage/set", payload))
+        cout << "error m4" << endl;
 }

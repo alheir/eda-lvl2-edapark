@@ -10,6 +10,7 @@
  */
 
 #include "raylib-cpp.hpp"
+#include "MQTTClient.h"
 
 class motor
 {
@@ -25,6 +26,8 @@ private:
 class controllerEDAbot
 {
 public:
+    controllerEDAbot();
+
     void moveForward();
     void moveBackward();
     void moveRight();
@@ -34,6 +37,8 @@ public:
     void stop();
 
 private:
+    MQTTClient client;
+
     float batteryLevel;
     float powerConsumption;
 
