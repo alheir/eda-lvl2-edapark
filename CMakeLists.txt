@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project("EDAPark Controller")
+project(edaPark)
 
 set (CMAKE_CXX_STANDARD 11)
 
@@ -16,19 +16,30 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     add_link_options(-fsanitize=undefined)
 endif()
 
-add_executable(main main.cpp MQTTClient.cpp)
+
+add_executable(${PROJECT_NAME} main.cpp MQTTClient.cpp)
 
 # Packages
 find_package(raylib CONFIG REQUIRED)
-find_package(mosquitto REQUIRED)
+find_package(raylib_cpp QUIET)
+if (NOT raylib_cpp_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+        raylib_cpp
+        GIT_REPOSITORY https://github.com/RobLoach/raylib-cpp.git
+        GIT_TAG v4.1.0
+    )
+    FetchContent_MakeAvailable(raylib_cpp)
+endif()
 find_package(OpenSSL REQUIRED)
 
-target_include_directories(main PRIVATE ${raylib_INCLUDE_DIRS} ${MOSQUITTO_INCLUDE_DIRS})
-target_link_libraries(main PRIVATE ${raylib_LIBRARIES} ${MOSQUITTO_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto)
-
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    find_package(mosquitto REQUIRED)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${raylib_INCLUDE_DIRS} ${MOSQUITTO_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${raylib_LIBRARIES} ${MOSQUITTO_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto raylib_cpp)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     # From "Working with CMake" documentation:
-    target_link_libraries(main PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    target_link_libraries(main PRIVATE m ${CMAKE_DL_LIBS} pthread GL rt X11)
+    target_link_libraries(${PROJECT_NAME} PRIVATE m ${CMAKE_DL_LIBS} pthread GL rt X11 raylib raylib_cpp mosquitto)
 endif()
