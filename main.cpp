@@ -10,98 +10,98 @@
  */
 
 #include <iostream>
-#include <vector>
-#include <stdio.h>
-#include <stdlib.h>
-#include <cstring>
 
-using namespace std;
 #include "controllerEDAbot.h"
 
+using namespace std;
 
 int main()
 {
-	controllerEDAbot controller;
+    int screenWidth = 450;
+    int screenHeight = 800;
+    raylib::Window window(screenWidth, screenHeight, "EDAbot Data Visualizer");
 
-	int screenWidth = 450;
-	int screenHeight = 800;
-	raylib::Color textColor = raylib::Color::LightGray();
-	raylib::Window window(screenWidth, screenHeight, "raylib [core] example - basic window");
-	controllerEDAbot control;
+    controllerEDAbot control;
 
-	SetTargetFPS(60);
+    SetTargetFPS(60);
 
-	// Main game loop
-	while (!window.ShouldClose())
-	{ // Detect window close button or ESC key
-	  // Update
-	  //----------------------------------------------------------------------------------
+    bool isLEDOn = false;
 
-		if (IsKeyDown(KEY_RIGHT))
-		{
-			control.moveRight();
-			DrawText("key right", 0, 0, 14, GOLD);
-		}
-		else if (IsKeyDown(KEY_LEFT))
-		{
-			control.moveLeft();
-			DrawText("key left", 0, 0, 14, GOLD);
-		}
-		else if (IsKeyDown(KEY_UP))
-		{
-			control.moveForward();
-			DrawText("key up", 0, 0, 14, GOLD);
-		}
+    // TODO: teclas para que el usuario elija método de control (tensión o corriente). Teclas para subir o bajar el valor.
 
-		else if (IsKeyDown(KEY_DOWN))
-		{
-			control.moveBackward();
-			DrawText("key down", 0, 0, 14, GOLD);
-		}
-		else if (IsKeyDown(KEY_D))
-		{
-			control.rotateRight();
-			DrawText("key D", 0, 0, 14, GOLD);
-		}
-		else if (IsKeyDown(KEY_A))
-		{
-			control.rotateLeft();
-			DrawText("key A", 0, 0, 14, GOLD);
-		}
+    while (!window.ShouldClose())
+    {
+
+        double time = GetTime();
+        double period = time - (long)time;
+        bool shouldLEDBeOn = (period < 0.1);
+        if (isLEDOn != shouldLEDBeOn)
+        {
+            unsigned char redColor = shouldLEDBeOn ? 0xff : 0;
+            control.publishColor(0, redColor);
+            control.publishColor(1, redColor);
+
+            isLEDOn = shouldLEDBeOn;
+        }
+
+        if (IsKeyDown(KEY_RIGHT))
+        {
+            control.moveRight();
+            DrawText("key right", 0, 0, 14, GOLD);
+        }
+        else if (IsKeyDown(KEY_LEFT))
+        {
+            control.moveLeft();
+            DrawText("key left", 0, 0, 14, GOLD);
+        }
+        else if (IsKeyDown(KEY_UP))
+        {
+            control.moveForward();
+            DrawText("key up", 0, 0, 14, GOLD);
+        }
+
+        else if (IsKeyDown(KEY_DOWN))
+        {
+            control.moveBackward();
+            DrawText("key down", 0, 0, 14, GOLD);
+        }
+        else if (IsKeyDown(KEY_D))
+        {
+            control.rotateRight();
+            DrawText("key D", 0, 0, 14, GOLD);
+        }
+        else if (IsKeyDown(KEY_I))
+        {
+            control.decreasePowerValue();
+            DrawText("key A", 0, 0, 14, GOLD);
+        }
+        else if (IsKeyDown(KEY_U))
+        {
+            control.increasePowerValue();
+            DrawText("key A", 0, 0, 14, GOLD);
+        }
+        else if (IsKeyDown(KEY_A))
+        {
+            control.rotateLeft();
+            DrawText("key A", 0, 0, 14, GOLD);
+        }
         else
         {
             control.stop();
         }
 
-		if (IsKeyDown(KEY_ENTER))
-		{
-			DrawText("key enter", 0, 0, 14, GOLD);
+        if (IsKeyDown(KEY_ENTER))
+        {
+            DrawText("key enter", 0, 0, 14, GOLD);
+        }
 
-			// std::vector<MQTTMessage> msg = client.getMessages();
- /*
-			 int i = 0;
-			 for (auto x : msg)
-			 {
-				 for (int i = 0; i < sizeof(readingTopics) / sizeof(readingTopics[0]); i++)
-				 {
-					 if (!x.topic.compare(readingTopics[i]))
-					 {
-						 DrawText(readingTopics[i].data(), 0, 10 * (i + 1), 12, GOLD);
-						 DrawText(std::to_string(charVectorToFloat(x.payload)).data(), 70, 10 * (i + 1), 12, GOLD);
-					 }
-				 }
-			 }*/
-		}
-		
-		BeginDrawing();
-		{
-			window.ClearBackground(BLACK);
+        BeginDrawing();
+        {
+            window.ClearBackground(BLACK);
             control.getInfo();
-		}
-		EndDrawing();
-	}
-	return 0;
+        }
+        EndDrawing();
+    }
+
+    return 0;
 }
-
-
-
