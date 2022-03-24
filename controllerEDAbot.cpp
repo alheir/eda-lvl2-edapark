@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  * @file controllerEDAbot.cpp
  * @author your name (you@domain.com)
@@ -28,7 +27,7 @@ controllerEDAbot::controllerEDAbot()
     {
         cout << "error subscribing" << endl;
     }
-=======
+}
 #include <iostream>
 #include <vector>
 #include <stdio.h>
@@ -111,5 +110,4 @@ void changeMotorVoltage(float m1, float m2, float m3, float m4, MQTTClient& clie
     payload = floatToCharVector(m4);
     if (!client.publish("robot1/motor4/voltage/set", payload))
         cout << "error m4" << endl;
->>>>>>> 90337eb (Intento de mover)
 }

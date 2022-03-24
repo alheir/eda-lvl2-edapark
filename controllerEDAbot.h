@@ -11,11 +11,7 @@
 
 #include "raylib-cpp.hpp"
 #include "MQTTClient.h"
-<<<<<<< HEAD
-
-=======
 void changeMotorVoltage(float m1, float m2, float m3, float m4, MQTTClient& client);
->>>>>>> 90337eb (Intento de mover)
 class motor
 {
 public:
@@ -45,8 +41,6 @@ private:
 
     float batteryLevel;
     float powerConsumption;
-
-    MQTTClient client;
 
     raylib::Vector3 position;
     raylib::Vector3 velocity;
