@@ -19,19 +19,6 @@ using namespace std;
 #include "controllerEDAbot.h"
 
 
-
-
-/**
- * @brief
- *
- * @param m1
- * @param m2
- * @param m3
- * @param m4
- * @param client
- */
-
-
 int main()
 {
 	controllerEDAbot controller;
@@ -41,7 +28,6 @@ int main()
 	raylib::Color textColor = raylib::Color::LightGray();
 	raylib::Window window(screenWidth, screenHeight, "raylib [core] example - basic window");
 	controllerEDAbot control;
-
 
 	SetTargetFPS(60);
 

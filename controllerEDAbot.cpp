@@ -1,13 +1,16 @@
 /**
  * @file controllerEDAbot.cpp
  * @author your name (you@domain.com)
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2022-03-23
- * 
+ *
  * @copyright Copyright (c) 2022
- * 
+ *
  */
+
+using namespace std;
+
 #include <iostream>
 #include <vector>
 #include <stdio.h>
@@ -18,53 +21,51 @@
 
 using namespace std;
 
-void changeMotorVoltage(float m1, float m2, float m3, float m4, MQTTClient* client);
-
 const std::string writingTopics[] =
-{
-    "robot1/power/powerConsumption",
-    "robot1/power/batteryLevel",
-    "robot1/motor1/voltage/set",
-    "robot1/motor2/voltage/set",
-    "robot1/motor3/voltage/set",
-    "robot1/motor4/voltage/set",
-    "robot1/motor1/current/set",
-    "robot1/motor2/current/set",
-    "robot1/motor3/current/set",
-    "robot1/motor4/current/set" };
+    {
+        "robot1/power/powerConsumption",
+        "robot1/power/batteryLevel",
+        "robot1/motor1/voltage/set",
+        "robot1/motor2/voltage/set",
+        "robot1/motor3/voltage/set",
+        "robot1/motor4/voltage/set",
+        "robot1/motor1/current/set",
+        "robot1/motor2/current/set",
+        "robot1/motor3/current/set",
+        "robot1/motor4/current/set"};
 
 const std::string readingTopics[] =
-{
-    "robot1/power/powerConsumption",
-    "robot1/power/batteryLevel",
-    "robot1/motor1/voltage",
-    "robot1/motor2/voltage",
-    "robot1/motor3/voltage",
-    "robot1/motor4/voltage",
-    "robot1/motor1/current",
-    "robot1/motor2/current",
-    "robot1/motor3/current",
-    "robot1/motor4/current",
-    "robot1/motor1/rpm",
-    "robot1/motor2/rpm",
-    "robot1/motor3/rpm",
-    "robot1/motor4/rpm",
-    "robot1/motor1/temperature",
-    "robot1/motor2/temperature",
-    "robot1/motor3/temperature",
-    "robot1/motor4/temperature",
-    "robot1/motor1/temperature",
-    "robot1/motor2/temperature",
-    "robot1/motor3/temperature",
-    "robot1/motor4/temperature" };
-
-
+    {
+        "robot1/power/powerConsumption",
+        "robot1/power/batteryLevel",
+        "robot1/motor1/voltage",
+        "robot1/motor2/voltage",
+        "robot1/motor3/voltage",
+        "robot1/motor4/voltage",
+        "robot1/motor1/current",
+        "robot1/motor2/current",
+        "robot1/motor3/current",
+        "robot1/motor4/current",
+        "robot1/motor1/rpm",
+        "robot1/motor2/rpm",
+        "robot1/motor3/rpm",
+        "robot1/motor4/rpm",
+        "robot1/motor1/temperature",
+        "robot1/motor2/temperature",
+        "robot1/motor3/temperature",
+        "robot1/motor4/temperature",
+        "robot1/motor1/temperature",
+        "robot1/motor2/temperature",
+        "robot1/motor3/temperature",
+        "robot1/motor4/temperature"};
 
 controllerEDAbot::controllerEDAbot()
 {
+    client = new MQTTClient("controller");
+    motorHandler = new motor[4];
+
     batteryLevel = 0.0f;
     powerConsumption = 0.0f;
-     client = new MQTTClient("controller");
 
     if (client->connect("127.0.0.1", 1883, "user", "vdivEMMN3SQWX2Ez"))
     {
@@ -79,12 +80,15 @@ controllerEDAbot::controllerEDAbot()
     }
 }
 
-
+controllerEDAbot::~controllerEDAbot()
+{
+    delete client;
+    delete[] motorHandler;
+}
 
 void controllerEDAbot::moveForward()
 {
     changeMotorVoltage(-1.0f, 1.0f, 1.0f, -1.0f, client);
-
 }
 void controllerEDAbot::moveBackward()
 {
@@ -116,14 +120,15 @@ void controllerEDAbot::stop()
     changeMotorVoltage(0.0f, 0.0f, 0.0f, 0.0f, client);
 }
 
-
-
-
-
-float charVectorToFloat(std::vector<char>& vector)
+motor *controllerEDAbot::getMotorInfo(int motorID)
 {
-    void* pt = vector.data();
-    return (*(float*)pt);
+    return motorHandler;
+}
+
+float charVectorToFloat(std::vector<char> &vector)
+{
+    void *pt = vector.data();
+    return (*(float *)pt);
 }
 
 std::vector<char> floatToCharVector(float data)
@@ -135,7 +140,7 @@ std::vector<char> floatToCharVector(float data)
 
     return vector;
 }
-void changeMotorVoltage(float m1, float m2, float m3, float m4, MQTTClient* client)
+void changeMotorVoltage(float m1, float m2, float m3, float m4, MQTTClient *client)
 {
     std::vector<char> payload;
 
