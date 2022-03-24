@@ -8,20 +8,13 @@
  * @copyright Copyright (c) 2022
  * 
  */
-
+#ifndef CONTROLLEREDABOT_H
+#define CONTROLLEREDABOT_H
 #include "raylib-cpp.hpp"
 #include "MQTTClient.h"
-void changeMotorVoltage(float m1, float m2, float m3, float m4, MQTTClient& client);
-class motor
-{
-public:
 
-private:
-    float voltage;
-    float current;
-    float rpm;
-    float temperature;
-};
+
+
 
 class controllerEDAbot
 {
@@ -37,7 +30,7 @@ public:
     void stop();
 
 private:
-    MQTTClient client;
+    MQTTClient* client;
 
     float batteryLevel;
     float powerConsumption;
@@ -46,4 +39,6 @@ private:
     raylib::Vector3 velocity;
     raylib::Vector3 rotation;
     raylib::Vector3 angularVelocity;
+    
 };
+#endif
