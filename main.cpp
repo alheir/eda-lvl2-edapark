@@ -17,49 +17,9 @@
 
 using namespace std;
 
-<<<<<<< HEAD
-#include <raylib-cpp.hpp>
-#include "controllerEDAbot.h"
+#include "MQTTClient.h"
 
-const std::string writingTopics[] =
-    {
-        "robot1/power/powerConsumption",
-        "robot1/power/batteryLevel",
-        "robot1/motor1/voltage/set",
-        "robot1/motor2/voltage/set",
-        "robot1/motor3/voltage/set",
-        "robot1/motor4/voltage/set",
-        "robot1/motor1/current/set",
-        "robot1/motor2/current/set",
-        "robot1/motor3/current/set",
-        "robot1/motor4/current/set"};
-
-const std::string readingTopics[] =
-    {
-        "robot1/power/powerConsumption",
-        "robot1/power/batteryLevel",
-        "robot1/motor1/voltage",
-        "robot1/motor2/voltage",
-        "robot1/motor3/voltage",
-        "robot1/motor4/voltage",
-        "robot1/motor1/current",
-        "robot1/motor2/current",
-        "robot1/motor3/current",
-        "robot1/motor4/current",
-        "robot1/motor1/rpm",
-        "robot1/motor2/rpm",
-        "robot1/motor3/rpm",
-        "robot1/motor4/rpm",
-        "robot1/motor1/temperature",
-        "robot1/motor2/temperature",
-        "robot1/motor3/temperature",
-        "robot1/motor4/temperature",
-        "robot1/motor1/temperature",
-        "robot1/motor2/temperature",
-        "robot1/motor3/temperature",
-        "robot1/motor4/temperature"};
-
-float charVectorToFloat(std::vector<char> &vector)
+float charVectorToFloat(std::vector<char>& vector)
 {
     void *pt = vector.data();
     return (*(float *)pt);
@@ -68,17 +28,11 @@ float charVectorToFloat(std::vector<char> &vector)
 std::vector<char> floatToCharVector(float data)
 {
     std::vector<char> vector;
-    vector.resize(sizeof(data));
+    vector.reserve(sizeof(data));
     std::memcpy(vector.data(), &data, sizeof(data));
+
     return vector;
 }
-=======
-#include "MQTTClient.h"
-#include "controllerEDAbot.h"
-
-
-
->>>>>>> 90337eb (Intento de mover)
 
 /**
  * @brief
@@ -92,23 +46,19 @@ std::vector<char> floatToCharVector(float data)
 void changeMotorVoltage(float m1, float m2, float m3, float m4, MQTTClient &client);
 
 int main()
-{
-<<<<<<< HEAD
     controllerEDAbot controller;
 
     int screenWidth = 800;
     int screenHeight = 450;
     raylib::Color textColor = raylib::Color::LightGray();
     raylib::Window window(screenWidth, screenHeight, "raylib [core] example - basic window");
-=======
     std::vector<MQTTMessage> msg;
     controllerEDAbot control;
     MQTTClient client("controller");
->>>>>>> 90337eb (Intento de mover)
+    MQTTClient client("controller");
 
     SetTargetFPS(60);
 
-<<<<<<< HEAD
     // Main game loop
     while (!window.ShouldClose())
     { // Detect window close button or ESC key
@@ -117,50 +67,12 @@ int main()
         if (IsKeyDown(KEY_RIGHT))
         {
             DrawText("key right", 0, 0, 14, GOLD);
-=======
-    //if (!client.subscribe("robot1/power/batteryLevel"))
-    //{
-        //cout << "error subscribing" << endl;
-    //}
-    
-    if (!client.subscribe("robot1/motor1/current"))
-        cout << "error m1" << endl;
-
-    
-    if (!client.subscribe("robot1/motor2/current"))
-        cout << "error m2" << endl;
-
-    
-    if (!client.subscribe("robot1/motor3/current"))
-        cout << "error m3" << endl;
-
-
-    if (!client.subscribe("robot1/motor4/current"))
-        cout << "error m4" << endl;
-
-
-
-    while (getchar())
-    {
-
-        cout << "looping" << endl;
-       
-
-        std:vector<MQTTMessage> msg = client.getMessages();
-
-        for(auto x : msg)
-        {
-
-            cout << x.topic << " ~ valor:";
-            cout << charVectorToFloat(x.payload) << endl;
->>>>>>> 90337eb (Intento de mover)
         }
-
         if (IsKeyDown(KEY_LEFT))
         {
             DrawText("key left", 0, 0, 14, GOLD);
         }
-
+    }
         if (IsKeyDown(KEY_UP))
         {
             DrawText("key up", 0, 0, 14, GOLD);
@@ -170,11 +82,11 @@ int main()
         {
             DrawText("key down", 0, 0, 14, GOLD);
         }
-
+            cout << "error";
         if (IsKeyDown(KEY_ENTER))
         {
             DrawText("key enter", 0, 0, 14, GOLD);
-
+            std:vector<MQTTMessage> msg = client.getMessages();
            // std::vector<MQTTMessage> msg = client.getMessages();
 /*
             int i = 0;
@@ -190,7 +102,7 @@ int main()
                 }
             }*/
         }
-
+            }
         //----------------------------------------------------------------------------------
 
         // Draw
