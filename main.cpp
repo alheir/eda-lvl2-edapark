@@ -23,8 +23,8 @@ int main()
 {
 	controllerEDAbot controller;
 
-	int screenWidth = 800;
-	int screenHeight = 450;
+	int screenWidth = 450;
+	int screenHeight = 800;
 	raylib::Color textColor = raylib::Color::LightGray();
 	raylib::Window window(screenWidth, screenHeight, "raylib [core] example - basic window");
 	controllerEDAbot control;
@@ -36,37 +36,42 @@ int main()
 	{ // Detect window close button or ESC key
 	  // Update
 	  //----------------------------------------------------------------------------------
+
 		if (IsKeyDown(KEY_RIGHT))
 		{
 			control.moveRight();
 			DrawText("key right", 0, 0, 14, GOLD);
 		}
-		if (IsKeyDown(KEY_LEFT))
+		else if (IsKeyDown(KEY_LEFT))
 		{
 			control.moveLeft();
 			DrawText("key left", 0, 0, 14, GOLD);
 		}
-		if (IsKeyDown(KEY_UP))
+		else if (IsKeyDown(KEY_UP))
 		{
 			control.moveForward();
 			DrawText("key up", 0, 0, 14, GOLD);
 		}
 
-		if (IsKeyDown(KEY_DOWN))
+		else if (IsKeyDown(KEY_DOWN))
 		{
 			control.moveBackward();
 			DrawText("key down", 0, 0, 14, GOLD);
 		}
-		if (IsKeyDown(KEY_D))
+		else if (IsKeyDown(KEY_D))
 		{
 			control.rotateRight();
 			DrawText("key D", 0, 0, 14, GOLD);
 		}
-		if (IsKeyDown(KEY_A))
+		else if (IsKeyDown(KEY_A))
 		{
 			control.rotateLeft();
 			DrawText("key A", 0, 0, 14, GOLD);
 		}
+        else
+        {
+            control.stop();
+        }
 
 		if (IsKeyDown(KEY_ENTER))
 		{
@@ -91,6 +96,7 @@ int main()
 		BeginDrawing();
 		{
 			window.ClearBackground(BLACK);
+            control.getInfo();
 		}
 		EndDrawing();
 	}

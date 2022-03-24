@@ -15,8 +15,6 @@
 #include "raylib-cpp.hpp"
 #include "MQTTClient.h"
 
-void changeMotorVoltage(float m1, float m2, float m3, float m4, MQTTClient *client);
-
 class motor
 {
 public:
@@ -43,6 +41,8 @@ class controllerEDAbot
 public:
     controllerEDAbot();
     ~controllerEDAbot();
+
+    void getInfo();
     
     void moveForward();
     void moveBackward();
@@ -57,6 +57,9 @@ public:
 private:
     MQTTClient *client;
     motor *motorHandler;
+
+    const float power = 6.0f;
+    const bool method = 1;
 
     float batteryLevel;
     float powerConsumption;
