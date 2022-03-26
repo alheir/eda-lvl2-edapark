@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <cstring>
 
 #include <mosquitto.h>
 
@@ -28,10 +29,27 @@ public:
 
     bool publish(std::string topic, std::vector<char> &payload);
 
+    template <typename T>
+    bool publishType(std::string topic, T data)
+    {
+        std::vector<char> payload;
+        payload.resize(sizeof(data));
+        std::memcpy(payload.data(), &data, sizeof(data));
+
+        return (publish(topic, payload));
+    }
+
     bool subscribe(std::string topic);
     bool unsubscribe(std::string topic);
 
     std::vector<MQTTMessage> getMessages();
+
+    template <typename T>
+    T convertMessage(std::vector<char> &vector)
+    {
+        void *pt = vector.data();
+        return (*(T *)pt);
+    }
 
 private:
     struct mosquitto *mosquittoInstance;

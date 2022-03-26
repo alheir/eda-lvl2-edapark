@@ -67,8 +67,7 @@ public:
     void increasePowerValue();
     void decreasePowerValue();
 
-    //TODO: cambiar esto!
-    void publishColor(bool eye, unsigned char red);
+    void setEyes(std::vector<unsigned char> leftEye, std::vector<unsigned char> rightEye);
 
 private:
     MQTTClient *client;
@@ -93,7 +92,7 @@ private:
     raylib::Vector3 rotation;
     raylib::Vector3 angularVelocity;
 
-    void setMotor(float m1, float m2, float m3, float m4, bool powerMethod);
+    void setMotors(float m1, float m2, float m3, float m4);
 };
 
 #endif // CONTROLLER_EDA_BOT_H

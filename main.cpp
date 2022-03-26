@@ -20,36 +20,36 @@ int main()
     int screenWidth = 450;
     int screenHeight = 800;
     raylib::Window window(screenWidth, screenHeight, "EDAbot Data Visualizer");
-    
 
     controllerEDAbot control;
-   
+
     SetTargetFPS(60);
 
     bool isLEDOn = false;
 
-    // TODO: teclas para que el usuario elija método de control (tensión o corriente). Teclas para subir o bajar el valor.
-
     while (!window.ShouldClose())
     {
         bool mode = control.getPowerMethod();
+
+        /* Marc code for blinking EDABot eyes */
         double time = GetTime();
         double period = time - (long)time;
         bool shouldLEDBeOn = (period < 0.1);
         if (isLEDOn != shouldLEDBeOn)
         {
             unsigned char redColor = shouldLEDBeOn ? 0xff : 0;
-            control.publishColor(0, redColor);
-            control.publishColor(1, redColor);
+
+            control.setEyes({redColor, 0, 0}, {redColor, 0, 0});
 
             isLEDOn = shouldLEDBeOn;
         }
-        
+        /* Marc code for blinking EDABot eyes */
+
         switch (mode)
         {
         case VOLTAGE:
-            DrawText("Mode Voltage", 0, 700,20, GOLD);
-                break;
+            DrawText("Mode Voltage", 0, 700, 20, GOLD);
+            break;
         case CURRENT:
             DrawText("Mode Current", 0, 700, 20, GOLD);
             break;
@@ -57,6 +57,7 @@ int main()
             break;
         }
         DrawText(to_string(control.getPower()).data(), 200, 700, 20, GOLD);
+
         if (IsKeyDown(KEY_RIGHT))
         {
             control.moveRight();

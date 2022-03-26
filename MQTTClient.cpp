@@ -124,11 +124,11 @@ void MQTTClient::disconnect()
  * MQTTClient::publish
  *
  * Publishes an MQTT message to the server.
- * 
+ *
  * Parameters:
  *  topic -     The MQTT topic
  *  payload -   The data to be sent
- * 
+ *
  * Returns: call succeeded
  */
 bool MQTTClient::publish(string topic, vector<char> &payload)
@@ -155,10 +155,10 @@ bool MQTTClient::publish(string topic, vector<char> &payload)
  *
  * Sends an MQTT subscription request.
  * Topic may be straight or contain wildcards ('+' for any topic, '#' for anything below in tree).
- * 
+ *
  * Parameters:
  *  topic -     The MQTT topic
- * 
+ *
  * Returns: call succeeded
  */
 bool MQTTClient::subscribe(string topic)
@@ -180,10 +180,10 @@ bool MQTTClient::subscribe(string topic)
  * MQTTClient::unsubscribe
  *
  * Sends an MQTT unsubscription request. Should match a previous subscription request.
- * 
+ *
  * Parameters:
  *  topic -     The MQTT topic
- * 
+ *
  * Returns: call succeeded
  */
 bool MQTTClient::unsubscribe(string topic)
@@ -202,7 +202,7 @@ bool MQTTClient::unsubscribe(string topic)
  * MQTTClient::getMessages
  *
  * Retrieve latest messages. Should be called quite frequently so messages do not accumulate.
- * 
+ *
  * Returns: the MQTT messages
  */
 vector<MQTTMessage> MQTTClient::getMessages()

@@ -21,8 +21,6 @@ using namespace std;
 
 using namespace std;
 
-
-
 const std::string writingTopics[] =
     {
         "robot1/power/powerConsumption",
@@ -55,10 +53,7 @@ const std::string readingTopics[] =
         "robot1/motor1/temperature",
         "robot1/motor2/temperature",
         "robot1/motor3/temperature",
-        "robot1/motor4/temperature" }; // 18
-
-float charVectorToFloat(std::vector<char> &vector);
-std::vector<char> floatToCharVector(float data);
+        "robot1/motor4/temperature"}; // 18
 
 controllerEDAbot::controllerEDAbot()
 {
@@ -84,6 +79,16 @@ controllerEDAbot::controllerEDAbot()
 
 controllerEDAbot::~controllerEDAbot()
 {
+    for (auto x : readingTopics)
+    {
+        if (!client->unsubscribe(x))
+        {
+            cout << "error unsubscribing" << x << endl;
+        }
+    }
+
+    client->disconnect();
+
     delete client;
     delete[] motorHandler;
 }
@@ -99,7 +104,7 @@ void controllerEDAbot::getInfo()
         {
             if (!x.topic.compare(readingTopics[i]))
             {
-                valuesHandler[i] = charVectorToFloat(x.payload);
+                valuesHandler[i] = client->convertMessage<float>(x.payload);
                 switch (i)
                 {
                 case 0:
@@ -162,41 +167,40 @@ void controllerEDAbot::getInfo()
             }
         }
     }
-
 }
 
 void controllerEDAbot::moveForward()
 {
-    setMotor(power, -power, -power, power, powerMethod);
+    setMotors(power, -power, -power, power);
 }
 void controllerEDAbot::moveBackward()
 {
-    setMotor(-power, power, power, -power, powerMethod);
+    setMotors(-power, power, power, -power);
 }
 
 void controllerEDAbot::moveRight()
 {
-    setMotor(-power, -power, power, power, powerMethod);
+    setMotors(-power, -power, power, power);
 }
 
 void controllerEDAbot::moveLeft()
 {
-    setMotor(power, power, -power, -power, powerMethod);
+    setMotors(power, power, -power, -power);
 }
 
 void controllerEDAbot::rotateRight()
 {
-    setMotor(-0.5f, -0.5f, -0.5f, -0.5f, powerMethod);
+    setMotors(-0.5f, -0.5f, -0.5f, -0.5f);
 }
 
 void controllerEDAbot::rotateLeft()
 {
-    setMotor(0.5f, 0.5f, 0.5f, 0.5f, powerMethod);
+    setMotors(0.5f, 0.5f, 0.5f, 0.5f);
 }
 
 void controllerEDAbot::stop()
 {
-    setMotor(0.0f, 0.0f, 0.0f, 0.0f, powerMethod);
+    setMotors(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 motor *controllerEDAbot::getMotorInfo(int motorID)
@@ -224,7 +228,6 @@ float controllerEDAbot::getPowerConsumption()
     return powerConsumption;
 }
 
-
 void controllerEDAbot::changePowerMethod()
 {
     powerMethod = !powerMethod;
@@ -238,7 +241,6 @@ void controllerEDAbot::changePowerMethod()
         powerCurrent = power;
         power = powerVoltage;
     }
-    
 }
 
 void controllerEDAbot::increasePowerValue()
@@ -258,66 +260,45 @@ void controllerEDAbot::decreasePowerValue()
     }
 }
 
-void controllerEDAbot::publishColor(bool eye, unsigned char red)
+void controllerEDAbot::setEyes(std::vector<unsigned char> rgbLeftEye, std::vector<unsigned char> rgbRightEye)
 {
-    std::vector<char> payload;
-    payload.resize(3);
-
-    payload[0] = red;
-    payload[1] = 0;
-    payload[2] = 0;
-
-    if (!eye)
+    if (!client->publishType("robot1/display/leftEye/set", rgbLeftEye))
     {
-        if (!client->publish("robot1/display/rightEye/set", payload))
-            cout << "error eye 0" << endl;
+        cout << "error left eye" << endl;
     }
-    else
+
+    if (!client->publishType("robot1/display/rightEye/set", rgbRightEye))
     {
-        if (!client->publish("robot1/display/leftEye/set", payload))
-            cout << "error eye 1" << endl;
+        cout << "error right eye" << endl;
     }
 }
 
-float charVectorToFloat(std::vector<char> &vector)
+void controllerEDAbot::setMotors(float m1, float m2, float m3, float m4)
 {
-    void *pt = vector.data();
-    return (*(float *)pt);
-}
+    static int methodIndexShifter = powerMethod * 4;
 
-std::vector<char> floatToCharVector(float data)
-{
-    std::vector<char> vector;
-    vector.resize(sizeof(data));
-
-    std::memcpy(vector.data(), &data, sizeof(data));
-
-    return vector;
-}
-
-void controllerEDAbot::setMotor(float m1, float m2, float m3, float m4, bool powerMethod)
-{
-    std::vector<char> payload;
-
-    payload = floatToCharVector(m1);
-    if (!client->publish(writingTopics[2 + powerMethod * 4], payload))
+    if (!client->publishType(writingTopics[2 + methodIndexShifter], m1))
+    {
         cout << "error m1" << endl;
+    }
 
-    payload = floatToCharVector(m2);
-    if (!client->publish(writingTopics[3 + powerMethod * 4], payload))
+    if (!client->publishType(writingTopics[3 + methodIndexShifter], m2))
+    {
         cout << "error m2" << endl;
+    }
 
-    payload = floatToCharVector(m3);
-    if (!client->publish(writingTopics[4 + powerMethod * 4], payload))
+    if (!client->publishType(writingTopics[4 + methodIndexShifter], m3))
+    {
         cout << "error m3" << endl;
+    }
 
-    payload = floatToCharVector(m4);
-    if (!client->publish(writingTopics[5 + powerMethod * 4], payload))
+    if (!client->publishType(writingTopics[5 + methodIndexShifter], m4))
+    {
         cout << "error m4" << endl;
+    }
 }
 
-
-float motor::getVoltage() 
+float motor::getVoltage()
 {
     return voltage;
 }
