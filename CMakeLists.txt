@@ -35,8 +35,8 @@ find_package(OpenSSL REQUIRED)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     find_package(mosquitto REQUIRED)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${raylib_INCLUDE_DIRS} ${MOSQUITTO_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${raylib_LIBRARIES} ${MOSQUITTO_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto raylib_cpp)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${RAYLIB_INCLUDE_DIRS} ${MOSQUITTO_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${RAYLIB_LIBRARIES} ${MOSQUITTO_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto raylib_cpp)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     # From "Working with CMake" documentation:
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")

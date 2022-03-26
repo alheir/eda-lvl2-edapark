@@ -15,6 +15,11 @@
 #include "raylib-cpp.hpp"
 #include "MQTTClient.h"
 
+enum POWER_METHODS
+{
+    VOLTAGE,
+    CURRENT
+};
 class motor
 {
 public:
@@ -74,6 +79,8 @@ private:
     const float maxVoltage = 24.0f;
 
     float power;
+    float powerCurrent;
+    float powerVoltage;
     bool powerMethod;
 
     float batteryLevel;

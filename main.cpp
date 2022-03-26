@@ -20,9 +20,10 @@ int main()
     int screenWidth = 450;
     int screenHeight = 800;
     raylib::Window window(screenWidth, screenHeight, "EDAbot Data Visualizer");
+    
 
     controllerEDAbot control;
-
+   
     SetTargetFPS(60);
 
     bool isLEDOn = false;
@@ -31,7 +32,7 @@ int main()
 
     while (!window.ShouldClose())
     {
-
+        bool mode = control.getPowerMethod();
         double time = GetTime();
         double period = time - (long)time;
         bool shouldLEDBeOn = (period < 0.1);
@@ -43,7 +44,19 @@ int main()
 
             isLEDOn = shouldLEDBeOn;
         }
-
+        
+        switch (mode)
+        {
+        case VOLTAGE:
+            DrawText("Mode Voltage", 0, 700,20, GOLD);
+                break;
+        case CURRENT:
+            DrawText("Mode Current", 0, 700, 20, GOLD);
+            break;
+        default:
+            break;
+        }
+        DrawText(to_string(control.getPower()).data(), 200, 700, 20, GOLD);
         if (IsKeyDown(KEY_RIGHT))
         {
             control.moveRight();
@@ -70,12 +83,12 @@ int main()
             control.rotateRight();
             DrawText("key D", 0, 0, 14, GOLD);
         }
-        else if (IsKeyDown(KEY_I))
+        else if (IsKeyPressed(KEY_U))
         {
             control.decreasePowerValue();
             DrawText("key A", 0, 0, 14, GOLD);
         }
-        else if (IsKeyDown(KEY_U))
+        else if (IsKeyPressed(KEY_I))
         {
             control.increasePowerValue();
             DrawText("key A", 0, 0, 14, GOLD);
@@ -85,6 +98,10 @@ int main()
             control.rotateLeft();
             DrawText("key A", 0, 0, 14, GOLD);
         }
+        else if (IsKeyPressed(KEY_M))
+        {
+            control.changePowerMethod();
+        }
         else
         {
             control.stop();
@@ -93,6 +110,18 @@ int main()
         if (IsKeyDown(KEY_ENTER))
         {
             DrawText("key enter", 0, 0, 14, GOLD);
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            string motorCurrent = "Motor " + to_string(i + 1) + " current = " + to_string(control.getMotorInfo(i)->getCurrent());
+            string motorVoltage = "Motor " + to_string(i + 1) + " voltage = " + to_string(control.getMotorInfo(i)->getVoltage());
+            string motorRpm = "Motor " + to_string(i + 1) + " rmp = " + to_string(control.getMotorInfo(i)->getRpm());
+            string motorTemperature = "Motor " + to_string(i + 1) + " temperature = " + to_string(control.getMotorInfo(i)->getTemperature());
+            DrawText(motorCurrent.data(), 0, 0 + i * 90, 20, GOLD);
+            DrawText(motorVoltage.data(), 0, 20 + i * 90, 20, GOLD);
+            DrawText(motorRpm.data(), 0, 40 + i * 90, 20, GOLD);
+            DrawText(motorTemperature.data(), 0, 60 + i * 90, 20, GOLD);
         }
 
         BeginDrawing();

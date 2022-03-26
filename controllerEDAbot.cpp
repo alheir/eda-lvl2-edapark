@@ -21,11 +21,7 @@ using namespace std;
 
 using namespace std;
 
-enum POWER_METHODS
-{
-    VOLTAGE,
-    CURRENT
-};
+
 
 const std::string writingTopics[] =
     {
@@ -59,11 +55,7 @@ const std::string readingTopics[] =
         "robot1/motor1/temperature",
         "robot1/motor2/temperature",
         "robot1/motor3/temperature",
-        "robot1/motor4/temperature",
-        "robot1/motor1/temperature",
-        "robot1/motor2/temperature",
-        "robot1/motor3/temperature",
-        "robot1/motor4/temperature"}; // 21
+        "robot1/motor4/temperature" }; // 18
 
 float charVectorToFloat(std::vector<char> &vector);
 std::vector<char> floatToCharVector(float data);
@@ -74,8 +66,9 @@ controllerEDAbot::controllerEDAbot()
     motorHandler = new motor[4];
 
     powerMethod = VOLTAGE;
-    power = 0; // Arranca con tensión 0 asignada
-
+    power = 0.0f; // Arranca con tensión 0 asignada
+    powerCurrent = 0.0f;
+    powerVoltage = 0.0f;
     if (client->connect("127.0.0.1", 1883, "user", "vdivEMMN3SQWX2Ez"))
     {
         cout << "Conectado..." << endl;
@@ -97,15 +90,6 @@ controllerEDAbot::~controllerEDAbot()
 
 void controllerEDAbot::getInfo()
 {
-
-    /*
-    // Imprime todos los topics siempre
-    for (int i = 0; i < sizeof(readingTopics) / sizeof(readingTopics[0]); i++)
-    {
-        DrawText(readingTopics[i].data(), 0, 20 * (i + 1), 16, GOLD);
-    }
-    */
-
     std::vector<MQTTMessage> msg = client->getMessages();
 
     // Actualiza valor del topic, si llega
@@ -116,9 +100,69 @@ void controllerEDAbot::getInfo()
             if (!x.topic.compare(readingTopics[i]))
             {
                 valuesHandler[i] = charVectorToFloat(x.payload);
+                switch (i)
+                {
+                case 0:
+                    powerConsumption = valuesHandler[i];
+                    break;
+                case 1:
+                    batteryLevel = valuesHandler[i];
+                    break;
+                case 2:
+                    motorHandler[0].updateVoltage(valuesHandler[i]);
+                    break;
+                case 3:
+                    motorHandler[1].updateVoltage(valuesHandler[i]);
+                    break;
+                case 4:
+                    motorHandler[2].updateVoltage(valuesHandler[i]);
+                    break;
+                case 5:
+                    motorHandler[3].updateVoltage(valuesHandler[i]);
+                    break;
+                case 6:
+                    motorHandler[0].updateCurrent(valuesHandler[i]);
+                    break;
+                case 7:
+                    motorHandler[1].updateCurrent(valuesHandler[i]);
+                    break;
+                case 8:
+                    motorHandler[2].updateCurrent(valuesHandler[i]);
+                    break;
+                case 9:
+                    motorHandler[3].updateCurrent(valuesHandler[i]);
+                    break;
+                case 10:
+                    motorHandler[0].updateRpm(valuesHandler[i]);
+                    break;
+                case 11:
+                    motorHandler[1].updateRpm(valuesHandler[i]);
+                    break;
+                case 12:
+                    motorHandler[2].updateRpm(valuesHandler[i]);
+                    break;
+                case 13:
+                    motorHandler[3].updateRpm(valuesHandler[i]);
+                    break;
+                case 14:
+                    motorHandler[0].updateTemperature(valuesHandler[i]);
+                    break;
+                case 15:
+                    motorHandler[1].updateTemperature(valuesHandler[i]);
+                    break;
+                case 16:
+                    motorHandler[2].updateTemperature(valuesHandler[i]);
+                    break;
+                case 17:
+                    motorHandler[3].updateTemperature(valuesHandler[i]);
+                    break;
+                default:
+                    break;
+                }
             }
         }
     }
+
 }
 
 void controllerEDAbot::moveForward()
@@ -180,10 +224,21 @@ float controllerEDAbot::getPowerConsumption()
     return powerConsumption;
 }
 
+
 void controllerEDAbot::changePowerMethod()
 {
     powerMethod = !powerMethod;
-    power = 0;
+    if (powerMethod == VOLTAGE)
+    {
+        powerVoltage = power;
+        power = powerCurrent;
+    }
+    else if (powerMethod == CURRENT)
+    {
+        powerCurrent = power;
+        power = powerVoltage;
+    }
+    
 }
 
 void controllerEDAbot::increasePowerValue()
@@ -259,4 +314,45 @@ void controllerEDAbot::setMotor(float m1, float m2, float m3, float m4, bool pow
     payload = floatToCharVector(m4);
     if (!client->publish(writingTopics[5 + powerMethod * 4], payload))
         cout << "error m4" << endl;
+}
+
+
+float motor::getVoltage() 
+{
+    return voltage;
+}
+
+float motor::getCurrent()
+{
+    return current;
+}
+
+float motor::getRpm()
+{
+    return rpm;
+}
+
+float motor::getTemperature()
+{
+    return temperature;
+}
+
+void motor::updateVoltage(float data)
+{
+    voltage = data;
+}
+
+void motor::updateCurrent(float data)
+{
+    current = data;
+}
+
+void motor::updateRpm(float data)
+{
+    rpm = data;
+}
+
+void motor::updateTemperature(float data)
+{
+    temperature = data;
 }
