@@ -18,7 +18,7 @@ using namespace std;
 #include <cstring>
 #include "controllerEDAbot.h"
 #include <iostream>
-
+ 
 using namespace std;
 
 const std::string writingTopics[] =
@@ -58,8 +58,8 @@ const std::string readingTopics[] =
 controllerEDAbot::controllerEDAbot()
 {
     client = new MQTTClient("controller");
-    motorHandler = new motor[4];
-
+    motorHandler = new motor[AMOUNTMOTORS];
+    valuesHandler = new float[sizeof(readingTopics) / sizeof(readingTopics[0])];
     powerMethod = VOLTAGE;
     power = 0.0f; // Arranca con tensión 0 asignada
     powerCurrent = 0.0f;
@@ -91,6 +91,7 @@ controllerEDAbot::~controllerEDAbot()
 
     delete client;
     delete[] motorHandler;
+    delete[] valuesHandler;
 }
 
 void controllerEDAbot::getInfo()
@@ -171,6 +172,7 @@ void controllerEDAbot::getInfo()
 
 void controllerEDAbot::moveForward()
 {
+
     setMotors(power, -power, -power, power);
 }
 void controllerEDAbot::moveBackward()
@@ -190,12 +192,12 @@ void controllerEDAbot::moveLeft()
 
 void controllerEDAbot::rotateRight()
 {
-    setMotors(-0.5f, -0.5f, -0.5f, -0.5f);
+    setMotors(-power/scaleRotation, -power / scaleRotation, -power / scaleRotation, -power / scaleRotation);
 }
 
 void controllerEDAbot::rotateLeft()
 {
-    setMotors(0.5f, 0.5f, 0.5f, 0.5f);
+    setMotors(power / scaleRotation, power / scaleRotation, power / scaleRotation, power / scaleRotation);
 }
 
 void controllerEDAbot::stop()
@@ -246,7 +248,7 @@ void controllerEDAbot::changePowerMethod()
 void controllerEDAbot::increasePowerValue()
 {
     if ((powerMethod == VOLTAGE && power < maxVoltage) ||
-        (powerMethod == CURRENT && power < maxCurrent))
+        (powerMethod == CURRENT && power < maxCurrent)) 
     {
         power += powerStep;
     }
@@ -260,14 +262,14 @@ void controllerEDAbot::decreasePowerValue()
     }
 }
 
-void controllerEDAbot::setEyes(std::vector<unsigned char> rgbLeftEye, std::vector<unsigned char> rgbRightEye)
+void controllerEDAbot::setEyes(std::vector <char> rgbLeftEye, std::vector<char> rgbRightEye)
 {
-    if (!client->publishType("robot1/display/leftEye/set", rgbLeftEye))
+    if (!client->publish("robot1/display/leftEye/set", rgbLeftEye))
     {
         cout << "error left eye" << endl;
     }
 
-    if (!client->publishType("robot1/display/rightEye/set", rgbRightEye))
+    if (!client->publish("robot1/display/rightEye/set", rgbRightEye))
     {
         cout << "error right eye" << endl;
     }
@@ -275,27 +277,28 @@ void controllerEDAbot::setEyes(std::vector<unsigned char> rgbLeftEye, std::vecto
 
 void controllerEDAbot::setMotors(float m1, float m2, float m3, float m4)
 {
-    static int methodIndexShifter = powerMethod * 4;
+        static int methodIndexShifter = powerMethod * 4;
 
-    if (!client->publishType(writingTopics[2 + methodIndexShifter], m1))
-    {
-        cout << "error m1" << endl;
-    }
+        if (!client->publishType(writingTopics[2 + methodIndexShifter], m1))
+        {
+            cout << "error m1" << endl;
+        }
 
-    if (!client->publishType(writingTopics[3 + methodIndexShifter], m2))
-    {
-        cout << "error m2" << endl;
-    }
+        if (!client->publishType(writingTopics[3 + methodIndexShifter], m2))
+        {
+            cout << "error m2" << endl;
+        }
 
-    if (!client->publishType(writingTopics[4 + methodIndexShifter], m3))
-    {
-        cout << "error m3" << endl;
-    }
+        if (!client->publishType(writingTopics[4 + methodIndexShifter], m3))
+        {
+            cout << "error m3" << endl;
+        }
 
-    if (!client->publishType(writingTopics[5 + methodIndexShifter], m4))
-    {
-        cout << "error m4" << endl;
-    }
+        if (!client->publishType(writingTopics[5 + methodIndexShifter], m4))
+        {
+            cout << "error m4" << endl;
+        }
+
 }
 
 float motor::getVoltage()
@@ -336,4 +339,22 @@ void motor::updateRpm(float data)
 void motor::updateTemperature(float data)
 {
     temperature = data;
+}
+
+float controllerEDAbot::getMaxTemperature()
+{
+    return maxTemperature;
+}
+void controllerEDAbot::checkTemperature()
+{
+    for (int i = 0; i < AMOUNTMOTORS; i++)
+    {
+ 
+        float temperatureMotor = motorHandler[i].getTemperature();
+        if (temperatureMotor > maxTemperature )
+        {
+            power = 0.0f;         
+        }
+
+    }
 }

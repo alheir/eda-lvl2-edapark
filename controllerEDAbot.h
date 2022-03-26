@@ -14,7 +14,7 @@
 
 #include "raylib-cpp.hpp"
 #include "MQTTClient.h"
-
+#define AMOUNTMOTORS 4
 enum POWER_METHODS
 {
     VOLTAGE,
@@ -60,15 +60,15 @@ public:
     float getPower();
     float getBatteryLevel();
     float getPowerConsumption();
-
+    float getMaxTemperature();
     void getInfo();
 
     void changePowerMethod();
     void increasePowerValue();
     void decreasePowerValue();
 
-    void setEyes(std::vector<unsigned char> leftEye, std::vector<unsigned char> rightEye);
-
+    void setEyes(std::vector <char> rgbLeftEye, std::vector<char> rgbRightEye);
+    void controllerEDAbot::checkTemperature();
 private:
     MQTTClient *client;
     motor *motorHandler;
@@ -76,16 +76,16 @@ private:
     const float powerStep = 0.5f;
     const float maxCurrent = 10.0f;
     const float maxVoltage = 24.0f;
-
+    const float maxTemperature = 40.0f;   //Encontramos este valor ensayando en el simulador 
+    const float scaleRotation = 5.0f;
     float power;
     float powerCurrent;
     float powerVoltage;
     bool powerMethod;
-
     float batteryLevel;
     float powerConsumption;
 
-    float valuesHandler[22];
+    float* valuesHandler;
 
     raylib::Vector3 position;
     raylib::Vector3 velocity;

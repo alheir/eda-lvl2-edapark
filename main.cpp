@@ -37,7 +37,7 @@ int main()
         bool shouldLEDBeOn = (period < 0.1);
         if (isLEDOn != shouldLEDBeOn)
         {
-            unsigned char redColor = shouldLEDBeOn ? 0xff : 0;
+            char redColor = shouldLEDBeOn ? 0xff : 0;
 
             control.setEyes({redColor, 0, 0}, {redColor, 0, 0});
 
@@ -56,48 +56,47 @@ int main()
         default:
             break;
         }
-        DrawText(to_string(control.getPower()).data(), 200, 700, 20, GOLD);
+        DrawText(to_string(control.getPower()).data(), 200, 700, 20, GOLD);  
 
         if (IsKeyDown(KEY_RIGHT))
         {
             control.moveRight();
-            DrawText("key right", 0, 0, 14, GOLD);
+            
         }
         else if (IsKeyDown(KEY_LEFT))
         {
             control.moveLeft();
-            DrawText("key left", 0, 0, 14, GOLD);
+            
         }
         else if (IsKeyDown(KEY_UP))
         {
             control.moveForward();
-            DrawText("key up", 0, 0, 14, GOLD);
+            
         }
-
         else if (IsKeyDown(KEY_DOWN))
         {
             control.moveBackward();
-            DrawText("key down", 0, 0, 14, GOLD);
+            
         }
         else if (IsKeyDown(KEY_D))
         {
             control.rotateRight();
-            DrawText("key D", 0, 0, 14, GOLD);
-        }
-        else if (IsKeyPressed(KEY_U))
-        {
-            control.decreasePowerValue();
-            DrawText("key A", 0, 0, 14, GOLD);
-        }
-        else if (IsKeyPressed(KEY_I))
-        {
-            control.increasePowerValue();
-            DrawText("key A", 0, 0, 14, GOLD);
+            
         }
         else if (IsKeyDown(KEY_A))
         {
             control.rotateLeft();
-            DrawText("key A", 0, 0, 14, GOLD);
+
+        }
+        else if (IsKeyPressed(KEY_U))
+        {
+            control.decreasePowerValue();
+            
+        }
+        else if (IsKeyPressed(KEY_I))
+        {
+            control.increasePowerValue();
+            
         }
         else if (IsKeyPressed(KEY_M))
         {
@@ -108,12 +107,7 @@ int main()
             control.stop();
         }
 
-        if (IsKeyDown(KEY_ENTER))
-        {
-            DrawText("key enter", 0, 0, 14, GOLD);
-        }
-
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < AMOUNTMOTORS; i++)
         {
             string motorCurrent = "Motor " + to_string(i + 1) + " current = " + to_string(control.getMotorInfo(i)->getCurrent());
             string motorVoltage = "Motor " + to_string(i + 1) + " voltage = " + to_string(control.getMotorInfo(i)->getVoltage());
@@ -122,9 +116,25 @@ int main()
             DrawText(motorCurrent.data(), 0, 0 + i * 90, 20, GOLD);
             DrawText(motorVoltage.data(), 0, 20 + i * 90, 20, GOLD);
             DrawText(motorRpm.data(), 0, 40 + i * 90, 20, GOLD);
-            DrawText(motorTemperature.data(), 0, 60 + i * 90, 20, GOLD);
-        }
 
+            //PONER CONSTANTES
+            if (control.getMotorInfo(i)->getTemperature() < control.getMaxTemperature() - 1.0f)
+            {
+                DrawText(motorTemperature.data(), 0, 60 + i * 90, 20, GOLD);
+            }
+            else
+            {
+                DrawText(motorTemperature.data(), 0, 60 + i * 90, 20, RED);
+            }
+            
+        }
+        control.checkTemperature();
+        //PONER CONSTANTES
+        
+        if (control.getBatteryLevel() < 0.2f)
+        {
+            DrawText("Battery Level Low", 0, 760, 20, RED);
+        }
         BeginDrawing();
         {
             window.ClearBackground(BLACK);
