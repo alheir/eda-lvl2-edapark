@@ -14,7 +14,7 @@
 
 #include "raylib-cpp.hpp"
 #include "MQTTClient.h"
-#define AMOUNTMOTORS 4
+#define AMOUNTMOTORS 6
 enum POWER_METHODS
 {
     VOLTAGE,
@@ -54,10 +54,11 @@ public:
     void rotateLeft();
     void stop();
 
-    void toggleDribbler();
+    void toggleDribblerPositive();
+    void toggleDribblerNegative();
     void stopDribbler();
 
-    motor *getMotorInfo(int motorID);
+    motor *getMotorInfo();
 
     bool getPowerMethod();
     float getPower();
@@ -81,7 +82,7 @@ private:
     const float maxVoltage = 24.0f;
     const float maxTemperature = 75.0f;   //Encontramos este valor ensayando en el simulador 
     const float scaleRotation = 5.0f;
-    const float dribblerVoltage = 12.0f;
+    const float dribblerVoltage = 1.0f;
 
     float power;
     float powerCurrent;

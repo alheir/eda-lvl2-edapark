@@ -13,6 +13,7 @@
 
 #include "controllerEDAbot.h"
 
+
 using namespace std;
 
 int main()
@@ -88,43 +89,42 @@ int main()
         }
         else if (IsKeyPressed(KEY_U))
         {
-            control.decreasePowerValue();
-            
+            control.decreasePowerValue();           
         }
         else if (IsKeyPressed(KEY_I))
         {
-            control.increasePowerValue();
-            
+            control.increasePowerValue();           
         }
         else if (IsKeyPressed(KEY_M))
         {
             control.changePowerMethod();
         }
-        else if (IsKeyPressed(KEY_K))
+        else if (IsKeyDown(KEY_K))
         {
-            control.toggleDribbler();
+            control.toggleDribblerPositive();
         }
-        else if (IsKeyPressed(KEY_L))
+        else if (IsKeyDown(KEY_L))
         {
-            control.stopDribbler();
+            control.toggleDribblerNegative();
         }
         else
         {
+            control.stopDribbler();
             control.stop();
         }
 
         for (int i = 0; i < AMOUNTMOTORS; i++)
         {
-            string motorCurrent = "Motor " + to_string(i + 1) + " current = " + to_string(control.getMotorInfo(i)->getCurrent());
-            string motorVoltage = "Motor " + to_string(i + 1) + " voltage = " + to_string(control.getMotorInfo(i)->getVoltage());
-            string motorRpm = "Motor " + to_string(i + 1) + " rmp = " + to_string(control.getMotorInfo(i)->getRpm());
-            string motorTemperature = "Motor " + to_string(i + 1) + " temperature = " + to_string(control.getMotorInfo(i)->getTemperature());
+            string motorCurrent = "Motor " + to_string(i + 1) + " current = " + to_string(control.getMotorInfo()[i].getCurrent());
+            string motorVoltage = "Motor " + to_string(i + 1) + " voltage = " + to_string(control.getMotorInfo()[i].getVoltage());
+            string motorRpm = "Motor " + to_string(i + 1) + " rmp = " + to_string(control.getMotorInfo()[i].getRpm());
+            string motorTemperature = "Motor " + to_string(i + 1) + " temperature = " + to_string(control.getMotorInfo()[i].getTemperature());
             DrawText(motorCurrent.data(), 0, 0 + i * 90, 20, GOLD);
             DrawText(motorVoltage.data(), 0, 20 + i * 90, 20, GOLD);
             DrawText(motorRpm.data(), 0, 40 + i * 90, 20, GOLD);
 
             //PONER CONSTANTES
-            if (control.getMotorInfo(i)->getTemperature() < control.getMaxTemperature() - 1.0f)
+            if (control.getMotorInfo()[i].getTemperature() < control.getMaxTemperature() - 1.0f)
             {
                 DrawText(motorTemperature.data(), 0, 60 + i * 90, 20, GOLD);
             }
