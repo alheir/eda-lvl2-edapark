@@ -45,18 +45,16 @@ int main()
         }
         /* Marc code for blinking EDABot eyes */
 
-        switch (mode)
+        if (mode == VOLTAGE)
         {
-        case VOLTAGE:
             DrawText("Mode Voltage", 0, 700, 20, GOLD);
-            break;
-        case CURRENT:
-            DrawText("Mode Current", 0, 700, 20, GOLD);
-            break;
-        default:
-            break;
         }
-        DrawText(to_string(control.getPower()).data(), 200, 700, 20, GOLD);  
+        else if (mode == CURRENT)
+        {
+            DrawText("Mode Current", 0, 700, 20, GOLD);
+        }
+        
+        DrawText(to_string(control.getPower()).data(), 200, 700, 20, GOLD);
 
         if (IsKeyDown(KEY_RIGHT))
         {
@@ -101,6 +99,14 @@ int main()
         else if (IsKeyPressed(KEY_M))
         {
             control.changePowerMethod();
+        }
+        else if (IsKeyPressed(KEY_K))
+        {
+            control.toggleDribbler();
+        }
+        else if (IsKeyPressed(KEY_L))
+        {
+            control.stopDribbler();
         }
         else
         {

@@ -25,14 +25,24 @@ const std::string writingTopics[] =
     {
         "robot1/power/powerConsumption",
         "robot1/power/batteryLevel",
-        "robot1/motor1/voltage/set",
+        "robot1/motor1/voltage/set", // 2
         "robot1/motor2/voltage/set",
         "robot1/motor3/voltage/set",
         "robot1/motor4/voltage/set",
-        "robot1/motor1/current/set",
+        "robot1/motor1/current/set", // 6
         "robot1/motor2/current/set",
         "robot1/motor3/current/set",
-        "robot1/motor4/current/set"};
+        "robot1/motor4/current/set",
+        "robot1/dribbler/voltage/set", // 10
+        "robot1/dribbler/current/set",
+        "robot1/kicker/charge/set", // 12
+        "robot1/kicker/kick/cmd",
+        "robot1/kicker/chip/cmd",
+        "robot1/display/lcd/set",    // 15
+        "robot1/display/leftEye/set" // 16
+        "robot1/display/rightEye/set"
+
+};
 
 const std::string readingTopics[] =
     {
@@ -203,6 +213,20 @@ void controllerEDAbot::rotateLeft()
 void controllerEDAbot::stop()
 {
     setMotors(0.0f, 0.0f, 0.0f, 0.0f);
+}
+
+void controllerEDAbot::toggleDribbler()
+{
+    static bool direction = false;
+
+    client->publishType(writingTopics[10], dribblerVoltage * (-1 * direction));
+
+    direction = !direction;
+}
+
+void controllerEDAbot::stopDribbler()
+{
+    client->publishType(writingTopics[10], 0);
 }
 
 motor *controllerEDAbot::getMotorInfo(int motorID)

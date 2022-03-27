@@ -54,6 +54,9 @@ public:
     void rotateLeft();
     void stop();
 
+    void toggleDribbler();
+    void stopDribbler();
+
     motor *getMotorInfo(int motorID);
 
     bool getPowerMethod();
@@ -76,8 +79,10 @@ private:
     const float powerStep = 0.5f;
     const float maxCurrent = 10.0f;
     const float maxVoltage = 24.0f;
-    const float maxTemperature = 40.0f;   //Encontramos este valor ensayando en el simulador 
+    const float maxTemperature = 75.0f;   //Encontramos este valor ensayando en el simulador 
     const float scaleRotation = 5.0f;
+    const float dribblerVoltage = 12.0f;
+
     float power;
     float powerCurrent;
     float powerVoltage;
