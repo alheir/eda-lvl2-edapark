@@ -24,11 +24,11 @@ using namespace std;
 const std::string writingTopics[] =
     {
 
-        "robot1/motor1/voltage/set", // 2
+        "robot1/motor1/voltage/set", 
         "robot1/motor2/voltage/set",
         "robot1/motor3/voltage/set",
         "robot1/motor4/voltage/set",
-        "robot1/motor1/current/set", // 6
+        "robot1/motor1/current/set", 
         "robot1/motor2/current/set",
         "robot1/motor3/current/set",
         "robot1/motor4/current/set",
@@ -51,23 +51,22 @@ const std::string readingTopics[] =
     "robot1/motor2/voltage",
     "robot1/motor3/voltage",
     "robot1/motor4/voltage",
-    "robot1/dribbler/voltage",
+    "robot1/motor5/voltage",
     "robot1/motor1/current",
     "robot1/motor2/current",
     "robot1/motor3/current",
     "robot1/motor4/current",
-    "robot1/dribbler/current",
+    "robot1/motor5/current",
     "robot1/motor1/rpm",
     "robot1/motor2/rpm",
     "robot1/motor3/rpm",
     "robot1/motor4/rpm",
-    "robot1/dribbler/rpm",
+    "robot1/motor5/rpm",
     "robot1/motor1/temperature",
     "robot1/motor2/temperature",
     "robot1/motor3/temperature",
     "robot1/motor4/temperature",
-    "robot1/dribbler/temperature",
-    "robot1/kicker/voltage" //22
+    "robot1/motor5/temperature" //22
 };
 controllerEDAbot::controllerEDAbot()
 {
@@ -82,13 +81,6 @@ controllerEDAbot::controllerEDAbot()
     {
         cout << "Conectado..." << endl;
     }
-    //for (auto x : readingTopics)
-    //{
-        //if (!client->subscribe(x))
-        //{
-           // cout << "error subscribing" << x << endl;
-        //}
-    //}
     if (!client->subscribe("robot1/+/+"))
     {
         cout << "error subscribing" << endl;
@@ -97,12 +89,10 @@ controllerEDAbot::controllerEDAbot()
 
 controllerEDAbot::~controllerEDAbot()
 {
-    for (auto x : readingTopics)
+
+    if (!client->unsubscribe("robot1/+/+"))
     {
-        if (!client->unsubscribe(x))
-        {
-            cout << "error unsubscribing" << x << endl;
-        }
+        cout << "error subscribing" << endl;
     }
 
     client->disconnect();
@@ -192,8 +182,6 @@ void controllerEDAbot::getInfo()
                 case 21:
                     motorHandler[4].updateTemperature(valuesHandler[i]);
                     break;
-                case 22:
-                    motorHandler[5].updateVoltage(valuesHandler[i]);
                 default:
                     break;
                 }
@@ -325,7 +313,13 @@ void controllerEDAbot::setEyes(std::vector <char> rgbLeftEye, std::vector<char> 
         cout << "error right eye" << endl;
     }
 }
-
+void controllerEDAbot::setLCD(std::vector<char> ledsColors)
+{
+    if (!client->publish(writingTopics[13], ledsColors))
+    {
+        cout << "error LEDs" << endl;
+    }
+}
 void controllerEDAbot::setMotors(float m1, float m2, float m3, float m4)
 {
         int methodIndexShifter = powerMethod * 4;

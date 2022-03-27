@@ -14,7 +14,7 @@
 
 #include "raylib-cpp.hpp"
 #include "MQTTClient.h"
-#define AMOUNTMOTORS 6
+#define AMOUNTMOTORS 5
 enum POWER_METHODS
 {
     VOLTAGE,
@@ -72,7 +72,9 @@ public:
     void decreasePowerValue();
 
     void setEyes(std::vector <char> rgbLeftEye, std::vector<char> rgbRightEye);
-    void controllerEDAbot::checkTemperature();
+    void checkTemperature();
+
+    void setLCD(std::vector<char> ledsColors);
 private:
     MQTTClient *client;
     motor *motorHandler;
@@ -92,7 +94,7 @@ private:
     float powerConsumption;
 
     float* valuesHandler;
-
+    
     raylib::Vector3 position;
     raylib::Vector3 velocity;
     raylib::Vector3 rotation;

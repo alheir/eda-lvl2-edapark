@@ -27,7 +27,7 @@ int main()
     SetTargetFPS(60);
 
     bool isLEDOn = false;
-
+    bool shouldLCDBeOn = false;
     while (!window.ShouldClose())
     {
         bool mode = control.getPowerMethod();
@@ -35,16 +35,39 @@ int main()
         /* Marc code for blinking EDABot eyes */
         double time = GetTime();
         double period = time - (long)time;
-        bool shouldLEDBeOn = (period < 0.1);
-        if (isLEDOn != shouldLEDBeOn)
+        bool shouldEyesBeOn = (period < 0.1);
+
+        bool shouldChangeColor = (period < 0.9);
+        if (isLEDOn != shouldEyesBeOn)
         {
-            char redColor = shouldLEDBeOn ? 0xff : 0;
+            char redColor = shouldEyesBeOn ? 0xff : 0;
 
             control.setEyes({redColor, 0, 0}, {redColor, 0, 0});
 
-            isLEDOn = shouldLEDBeOn;
+            isLEDOn = shouldEyesBeOn;
         }
-        /* Marc code for blinking EDABot eyes */
+        std::vector<char> testDisplay;
+        testDisplay.resize(768);
+       
+        if (!shouldLCDBeOn)
+        {
+            std::memset(testDisplay.data(), 0, 768);   
+            control.setLCD(testDisplay);
+        }
+        if (shouldChangeColor && shouldLCDBeOn)
+        {
+            static unsigned char color1 = 0;
+            static unsigned char color2 = 2;
+            static unsigned char color3 = 4;
+            std::memset(testDisplay.data(), color1, 256);
+            color1 += 2;
+            std::memset(testDisplay.data() + 256, color2, 256);
+            color2 += 4;
+            std::memset(testDisplay.data() + 512, color3, 256);
+            color3 += 6;
+            control.setLCD(testDisplay);
+            shouldChangeColor = false;
+        }
 
         if (mode == VOLTAGE)
         {
@@ -106,6 +129,10 @@ int main()
         else if (IsKeyDown(KEY_L))
         {
             control.toggleDribblerNegative();
+        }
+        else if (IsKeyPressed(KEY_C))
+        {
+            shouldLCDBeOn = !shouldLCDBeOn;          
         }
         else
         {
