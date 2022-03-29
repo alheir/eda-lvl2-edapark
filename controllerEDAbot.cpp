@@ -41,8 +41,8 @@ static const string writingTopics[] =
 
 static const string readingTopics[] =
     {
-        "robot1/controlValue/powerConsumption",
-        "robot1/controlValue/batteryLevel",
+        "robot1/power/powerConsumption",
+        "robot1/power/batteryLevel",
         "robot1/motor1/voltage",
         "robot1/motor2/voltage",
         "robot1/motor3/voltage",

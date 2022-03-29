@@ -29,7 +29,7 @@ using namespace std;
 int main()
 {
     int screenWidth = 450;
-    int screenHeight = 800;
+    int screenHeight = 700;
     raylib::Window window(screenWidth, screenHeight, "EDAbot Data Visualizer");
 
     controllerEDAbot control;
@@ -153,24 +153,31 @@ int main()
             bool mode = control.getControlMethod();
             if (mode == VOLTAGE)
             {
-                DrawText("Mode Voltage", 0, 700, 20, GOLD);
+                DrawText("Mode Voltage", 0, 500, 20, GOLD);
             }
             else if (mode == CURRENT)
             {
-                DrawText("Mode Current", 0, 700, 20, GOLD);
+                DrawText("Mode Current", 0, 500, 20, GOLD);
             }
-            DrawText(to_string(control.getPower()).data(), 200, 700, 20, GOLD);
+            DrawText(to_string(control.getPower()).data(), 200, 500, 20, GOLD);
             // Modo de control de motores
+
+            // Consumo
+            string consumptionString = "Power Consumption: " + to_string(control.getPowerConsumption());
+            DrawText(consumptionString.data(), 0, 550, 20, GOLD);
+            // Consumo
 
             // Nivel de batería
             float batteryLevel = control.getBatteryLevel();
             if (batteryLevel < 0.2f)
             {
-                DrawText("Battery Level Low", 0, 760, 20, RED);
+                string batteryString = "Battery Level Low: " + to_string(batteryLevel);
+                DrawText(batteryString.data(), 0, 600, 20, RED);
             }
             else
             {
-                DrawText("Battery Level:", 0, 760, 20, RED);
+                string batteryString = "Battery Level: " + to_string(batteryLevel);
+                DrawText(batteryString.data(), 0, 600, 20, GOLD);
             }
             // Nivel de batería
 
