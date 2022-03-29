@@ -1,18 +1,28 @@
 /**
  * @file main.cpp
- * @author your name (you@domain.com)
- * @brief
+ * @author Grupo 19: Alejandro Nahuel Heir, Anna Candela Gioia Perez
+ * @subject Algoritmos y estructura de datos
+ * @brief main file. Inicializa el controlador y muestra información que obtiene del EDABot
  * @version 0.1
- * @date 2022-03-22
+ * @date 2022-03-23
  *
  * @copyright Copyright (c) 2022
+ *
+ * CONTROLES DEL EDABOT POR TECLADO:
+ *  -Movimientos de traslacion: flechas
+ *  -Rotación a derecha: D
+ *  -Rotación a izquierda: A
+ *  -Aumentar tensión/corriente: I
+ *  -Reducir tensión/corriente: U
+ *  -Cambiar método de control: M
+ *  -Mover dribbler hacia delante: K
+ *  -Mover dribbler hacia atrás: L
+ *  -Encender/apagar display: C
  *
  */
 
 #include <iostream>
-
 #include "controllerEDAbot.h"
-
 
 using namespace std;
 
@@ -26,18 +36,19 @@ int main()
 
     SetTargetFPS(60);
 
-    bool isLEDOn = false;
-    bool shouldLCDBeOn = false;
+    // Paquete RGB a mandarle al display ("sin mucho esfuerzo")
+    std::vector<char> displayMsg;
+    displayMsg.resize(768);
+
     while (!window.ShouldClose())
     {
-        bool mode = control.getPowerMethod();
+        control.update();
 
-        /* Marc code for blinking EDABot eyes */
+        // Marc's code for blinking EDABot eyes
         double time = GetTime();
         double period = time - (long)time;
+        static bool isLEDOn = false;
         bool shouldEyesBeOn = (period < 0.1);
-
-        bool shouldChangeColor = (period < 0.9);
         if (isLEDOn != shouldEyesBeOn)
         {
             char redColor = shouldEyesBeOn ? 0xff : 0;
@@ -46,132 +57,167 @@ int main()
 
             isLEDOn = shouldEyesBeOn;
         }
-        std::vector<char> testDisplay;
-        testDisplay.resize(768);
-       
+        // Marc's code for blinking EDABot eyes
+
+        // Manejo básico del display del EDABot
+        // (escala de grises y dividido en 3 franjas)
+        static bool shouldLCDBeOn = false;
+        bool shouldLCDChangeColor = (period < 0.9);
         if (!shouldLCDBeOn)
         {
-            std::memset(testDisplay.data(), 0, 768);   
-            control.setLCD(testDisplay);
+            std::memset(displayMsg.data(), 0, 768);
+            control.setLCD(displayMsg);
         }
-        if (shouldChangeColor && shouldLCDBeOn)
+        if (shouldLCDChangeColor && shouldLCDBeOn)
         {
             static unsigned char color1 = 0;
             static unsigned char color2 = 2;
             static unsigned char color3 = 4;
-            std::memset(testDisplay.data(), color1, 256);
+
+            std::memset(displayMsg.data(), color1, 256);
+            std::memset(displayMsg.data() + 256, color2, 256);
+            std::memset(displayMsg.data() + 512, color3, 256);
+
+            control.setLCD(displayMsg);
+
             color1 += 2;
-            std::memset(testDisplay.data() + 256, color2, 256);
             color2 += 4;
-            std::memset(testDisplay.data() + 512, color3, 256);
             color3 += 6;
-            control.setLCD(testDisplay);
-            shouldChangeColor = false;
-        }
 
-        if (mode == VOLTAGE)
-        {
-            DrawText("Mode Voltage", 0, 700, 20, GOLD);
+            shouldLCDChangeColor = false;
         }
-        else if (mode == CURRENT)
-        {
-            DrawText("Mode Current", 0, 700, 20, GOLD);
-        }
-        
-        DrawText(to_string(control.getPower()).data(), 200, 700, 20, GOLD);
+        // Manejo básico del display del EDABot
 
+        // Detección de teclas con raylib
         if (IsKeyDown(KEY_RIGHT))
         {
             control.moveRight();
-            
         }
         else if (IsKeyDown(KEY_LEFT))
         {
             control.moveLeft();
-            
         }
         else if (IsKeyDown(KEY_UP))
         {
             control.moveForward();
-            
         }
         else if (IsKeyDown(KEY_DOWN))
         {
             control.moveBackward();
-            
         }
         else if (IsKeyDown(KEY_D))
         {
             control.rotateRight();
-            
         }
         else if (IsKeyDown(KEY_A))
         {
             control.rotateLeft();
-
         }
         else if (IsKeyPressed(KEY_U))
         {
-            control.decreasePowerValue();           
+            control.decreaseControlValue();
         }
         else if (IsKeyPressed(KEY_I))
         {
-            control.increasePowerValue();           
+            control.increaseControlValue();
         }
         else if (IsKeyPressed(KEY_M))
         {
-            control.changePowerMethod();
+            control.changeControlMethod();
         }
         else if (IsKeyDown(KEY_K))
         {
-            control.toggleDribblerPositive();
+            control.setDribblerForward();
         }
         else if (IsKeyDown(KEY_L))
         {
-            control.toggleDribblerNegative();
+            control.setDribblerBackward();
         }
         else if (IsKeyPressed(KEY_C))
         {
-            shouldLCDBeOn = !shouldLCDBeOn;          
+            shouldLCDBeOn = !shouldLCDBeOn;
         }
         else
         {
-            control.stopDribbler();
             control.stop();
         }
+        // Detección de teclas con raylib
 
-        for (int i = 0; i < AMOUNTMOTORS; i++)
-        {
-            string motorCurrent = "Motor " + to_string(i + 1) + " current = " + to_string(control.getMotorInfo()[i].getCurrent());
-            string motorVoltage = "Motor " + to_string(i + 1) + " voltage = " + to_string(control.getMotorInfo()[i].getVoltage());
-            string motorRpm = "Motor " + to_string(i + 1) + " rmp = " + to_string(control.getMotorInfo()[i].getRpm());
-            string motorTemperature = "Motor " + to_string(i + 1) + " temperature = " + to_string(control.getMotorInfo()[i].getTemperature());
-            DrawText(motorCurrent.data(), 0, 0 + i * 90, 20, GOLD);
-            DrawText(motorVoltage.data(), 0, 20 + i * 90, 20, GOLD);
-            DrawText(motorRpm.data(), 0, 40 + i * 90, 20, GOLD);
-
-            //PONER CONSTANTES
-            if (control.getMotorInfo()[i].getTemperature() < control.getMaxTemperature() - 1.0f)
-            {
-                DrawText(motorTemperature.data(), 0, 60 + i * 90, 20, GOLD);
-            }
-            else
-            {
-                DrawText(motorTemperature.data(), 0, 60 + i * 90, 20, RED);
-            }
-            
-        }
-        control.checkTemperature();
-        //PONER CONSTANTES
-        
-        if (control.getBatteryLevel() < 0.2f)
-        {
-            DrawText("Battery Level Low", 0, 760, 20, RED);
-        }
+        // Visualización de la información del EDABot mediante raylib.
+        // (constantes para posicionar texto totalmente empíricas)
         BeginDrawing();
         {
             window.ClearBackground(BLACK);
-            control.getInfo();
+
+            // Modo de control de motores
+            bool mode = control.getControlMethod();
+            if (mode == VOLTAGE)
+            {
+                DrawText("Mode Voltage", 0, 700, 20, GOLD);
+            }
+            else if (mode == CURRENT)
+            {
+                DrawText("Mode Current", 0, 700, 20, GOLD);
+            }
+            DrawText(to_string(control.getPower()).data(), 200, 700, 20, GOLD);
+            // Modo de control de motores
+
+            // Nivel de batería
+            float batteryLevel = control.getBatteryLevel();
+            if (batteryLevel < 0.2f)
+            {
+                DrawText("Battery Level Low", 0, 760, 20, RED);
+            }
+            else
+            {
+                DrawText("Battery Level:", 0, 760, 20, RED);
+            }
+            // Nivel de batería
+
+            // Información de motores.
+            for (int i = 0; i < control.getMotorNum(); i++)
+            {
+                string motorCurrentMsg = "Motor " +
+                                         to_string(i + 1) +
+                                         " current = " +
+                                         to_string(control.getMotorInfo()[i].current);
+
+                string motorVoltageMsg = "Motor " +
+                                         to_string(i + 1) +
+                                         " voltage = " +
+                                         to_string(control.getMotorInfo()[i].voltage);
+
+                string motorRpmMsg = "Motor " +
+                                     to_string(i + 1) +
+                                     " rmp = " +
+                                     to_string(control.getMotorInfo()[i].rpm);
+
+                float temperature = control.getMotorInfo()[i].temperature;
+                string motorTemperatureMsg = "Motor " +
+                                             to_string(i + 1) +
+                                             " temperature = " +
+                                             to_string(temperature);
+
+                DrawText(motorCurrentMsg.data(), 0, 0 + i * 90, 20, GOLD);
+                DrawText(motorVoltageMsg.data(), 0, 20 + i * 90, 20, GOLD);
+                DrawText(motorRpmMsg.data(), 0, 40 + i * 90, 20, GOLD);
+
+                // Aviso de temperatura peligrosa
+                //
+                // Mencionable que el controlador ya frena los motores
+                // si se llega a maxTemperature
+                static const float warningWindow = 5.0f;
+                if (temperature < control.getMaxTemperature() - warningWindow)
+                {
+                    DrawText(motorTemperatureMsg.data(), 0, 60 + i * 90, 20, GOLD);
+                }
+                else
+                {
+                    DrawText(motorTemperatureMsg.data(), 0, 60 + i * 90, 20, RED);
+                }
+                // Aviso de temperatura peligrosa
+            }
+            // Información de motores
         }
         EndDrawing();
     }

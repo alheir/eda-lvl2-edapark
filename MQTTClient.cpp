@@ -1,10 +1,15 @@
-/*
- * Simple MQTT Client
+/**
+ * @file MQTTClient.h
+ * @author Marc S. Ressl
+ * @brief Simple MQTT Client
+ * @version 0.1
+ * @date 2022-03-29
  *
- * Copyright (C) 2022 Marc S. Ressl
+ * @copyright Copyright (c) 2022
  *
  * libmosquitto documentation:
  * https://mosquitto.org/api/files/mosquitto-h.html
+ *
  */
 
 #include <cstring>

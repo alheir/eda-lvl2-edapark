@@ -1,8 +1,16 @@
-/*
- * Simple MQTT Client
+/**
+ * @file MQTTClient.h
+ * @author Marc S. Ressl
+ * @brief Simple MQTT Client
+ * @version 0.1
+ * @date 2022-03-29
  *
- * Copyright (C) 2022 Marc S. Ressl
+ * @copyright Copyright (c) 2022
+ *
  */
+
+#ifndef MQTT_CLIENT_H
+#define MQTT_CLIENT_H
 
 #include <string>
 #include <vector>
@@ -29,6 +37,15 @@ public:
 
     bool publish(std::string topic, std::vector<char> &payload);
 
+    /**
+     * @brief Hace un publish de un dato tipo dato (float, int, char, double...)
+     *
+     * @tparam T Tipo de dato
+     * @param topic
+     * @param data
+     * @return true Éxito
+     * @return false Fallo
+     */
     template <typename T>
     bool publishType(std::string topic, T data)
     {
@@ -44,6 +61,13 @@ public:
 
     std::vector<MQTTMessage> getMessages();
 
+    /**
+     * @brief Toma un payload MQTT dado y lo devuelve interpretado en algún tipo de dato
+     *
+     * @tparam T Tipo de dato dado
+     * @param vector Payload a procesar
+     * @return T Valor procesado
+     */
     template <typename T>
     T convertMessage(std::vector<char> &vector)
     {
@@ -61,3 +85,5 @@ private:
                               void *context,
                               const struct mosquitto_message *message);
 };
+
+#endif // MQTT_CLIENT_H

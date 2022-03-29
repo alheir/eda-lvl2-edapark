@@ -2,7 +2,7 @@
  * @file controllerEDAbot.h
  * @author Grupo 19: Alejandro Nahuel Heir, Anna Candela Gioia Perez
  * @subject Algoritmos y estructura de datos
- * @brief
+ * @brief Controlador del EDABot
  * @version 0.1
  * @date 2022-03-22
  *
@@ -15,33 +15,20 @@
 
 #include "raylib-cpp.hpp"
 #include "MQTTClient.h"
-#define AMOUNTMOTORS 5
 
-enum POWER_METHODS
+enum CONTROL_METHODS
 {
     VOLTAGE,
     CURRENT
 };
 
-
 class motor
 {
 public:
-    float getVoltage();
-    float getCurrent();
-    float getRpm();
-    float getTemperature();
-
-    void updateVoltage(float data);
-    void updateCurrent(float data);
-    void updateRpm(float data);
-    void updateTemperature(float data);
-
-private:
-    float voltage;
-    float current;
-    float rpm;
-    float temperature;
+    float voltage = 0;
+    float current = 0;
+    float rpm = 0;
+    float temperature = 0;
 };
 
 class controllerEDAbot
@@ -49,6 +36,8 @@ class controllerEDAbot
 public:
     controllerEDAbot();
     ~controllerEDAbot();
+
+    void update();
 
     void moveForward();
     void moveBackward();
@@ -58,55 +47,56 @@ public:
     void rotateLeft();
     void stop();
 
-    void toggleDribblerPositive();
-    void toggleDribblerNegative();
-    void stopDribbler();
+    void setDribblerForward();
+    void setDribblerBackward();
 
     motor *getMotorInfo();
 
-    bool getPowerMethod();
+    bool getControlMethod();
     float getPower();
     float getBatteryLevel();
     float getPowerConsumption();
     float getMaxTemperature();
-    void getInfo();
+    int getMotorNum();
 
-    void changePowerMethod();
-    void increasePowerValue();
-    void decreasePowerValue();
+    void changeControlMethod();
+    void increaseControlValue();
+    void decreaseControlValue();
 
-    void setEyes(std::vector <char> rgbLeftEye, std::vector<char> rgbRightEye);
-    void checkTemperature();
+    void setEyes(std::vector<char> rgbLeftEye, std::vector<char> rgbRightEye);
 
     void setLCD(std::vector<char> ledsColors);
+
 private:
     MQTTClient *client;
     motor *motorHandler;
+    float *valuesHandler; // Para manejar arreglo de valores que envía EDABot
 
-    const float powerStep = 0.5f;
+    const float controlValueStep = 0.5f; // Pasos del controlValue permitidos al usuario
     const float maxCurrent = 10.0f;
     const float maxVoltage = 24.0f;
-    const float maxTemperature = 75.0f;     //Encontramos este valor ensayando en el simulador 
-    const float scaleRotation = 5.0f;     
+    const float maxTemperature = 75.0f; // Valor empírico (a más de 80°C, se queman)
+    const float scaleRotation = 5.0f;
     const float dribblerVoltage = 1.0f;
+    const int motorNum = 5;
 
-    //M�todo de potencia: tensi�n o corriente 
-    bool powerMethod;                       
-
-    float power;
-    float powerCurrent;
-    float powerVoltage;
+    bool controlMethod; // Método de control: tensión o corriente
+    float controlValue; // Valor de tensión o corriente seleccionado
+    float lastCurrentValue;
+    float lastVoltageValue;
     float batteryLevel;
     float powerConsumption;
 
-    float* valuesHandler;
-    
+    // Actualmente, no implementado
     raylib::Vector3 position;
     raylib::Vector3 velocity;
     raylib::Vector3 rotation;
     raylib::Vector3 angularVelocity;
+    // Actualmente, no implementado
 
-    void setMotors(float m1, float m2, float m3, float m4);
+    void setMotors(float motor1, float motor2, float motor3, float motor4);
+    void getData();
+    void checkTemperature();
 };
 
 #endif // CONTROLLER_EDA_BOT_H
