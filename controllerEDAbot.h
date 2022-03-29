@@ -1,6 +1,7 @@
 /**
  * @file controllerEDAbot.h
- * @author your name (you@domain.com)
+ * @author Grupo 19: Alejandro Nahuel Heir, Anna Candela Gioia Perez
+ * @subject Algoritmos y estructura de datos
  * @brief
  * @version 0.1
  * @date 2022-03-22
@@ -15,11 +16,14 @@
 #include "raylib-cpp.hpp"
 #include "MQTTClient.h"
 #define AMOUNTMOTORS 5
+
 enum POWER_METHODS
 {
     VOLTAGE,
     CURRENT
 };
+
+
 class motor
 {
 public:
@@ -82,14 +86,16 @@ private:
     const float powerStep = 0.5f;
     const float maxCurrent = 10.0f;
     const float maxVoltage = 24.0f;
-    const float maxTemperature = 75.0f;   //Encontramos este valor ensayando en el simulador 
-    const float scaleRotation = 5.0f;
+    const float maxTemperature = 75.0f;     //Encontramos este valor ensayando en el simulador 
+    const float scaleRotation = 5.0f;     
     const float dribblerVoltage = 1.0f;
+
+    //Método de potencia: tensión o corriente 
+    bool powerMethod;                       
 
     float power;
     float powerCurrent;
     float powerVoltage;
-    bool powerMethod;
     float batteryLevel;
     float powerConsumption;
 
