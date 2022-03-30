@@ -43,3 +43,20 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(${PROJECT_NAME} PRIVATE m ${CMAKE_DL_LIBS} pthread GL rt X11 raylib raylib_cpp mosquitto)
 endif()
+
+# Test
+enable_testing()
+add_executable(main_test main_test.cpp MQTTClient.cpp)
+add_test(NAME test1 COMMAND main_test)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    find_package(mosquitto REQUIRED)
+    target_include_directories(main_test PRIVATE ${RAYLIB_INCLUDE_DIRS} ${MOSQUITTO_INCLUDE_DIRS})
+    target_link_libraries(main_test PRIVATE ${RAYLIB_LIBRARIES} ${MOSQUITTO_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto raylib_cpp)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    # From "Working with CMake" documentation:
+    target_link_libraries(main_test PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    target_link_libraries(main_test PRIVATE m ${CMAKE_DL_LIBS} pthread GL rt X11 raylib raylib_cpp mosquitto)
+endif()
+
