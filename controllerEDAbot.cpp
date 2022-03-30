@@ -104,40 +104,33 @@ void controllerEDAbot::update()
     checkTemperature();
 }
 
-/**
- * @brief Mueve el robot hacia adelante
- *
- */
-void controllerEDAbot::moveForward()
+void controllerEDAbot::moveRobot(raylib::Vector2 vectorMove)
 {
-    setMotors(controlValue, -controlValue, -controlValue, controlValue);
-}
+   /*
+   *  (1,0) = (-1,-1,1,1)                   //Derecha
+   *  (0,1) = (1,-1,-1,1)                   //Adelante
+   *  (-1,0) = (1,1,-1,-1)                  //Izquierda
+   *  (0,-1) = (-1,1,1,-1)                  //Atrás
+   *  (1,1) = (1,0) + (0,1) = (0,-2,0,2)    //Derecha y adelante
+   *  (1,-1) = (1,0) - (0.1) = (-2,0,2,0)   //Derecha y atrás
+   *  (-1,-1) = -(1,0) - (0,1) = (0,2,0,-2) //Izquierda y atrás
+   *  (-1,1) = -(1,0) + (0,1) = (2,0,-2,0)  //Izquierda y adelante 
+   *
+   */
+   float x = unitX.GetX() * vectorMove.GetX() + unitY.GetX()* vectorMove.GetY();
+   float y = unitX.GetY() * vectorMove.GetX() + unitY.GetY() * vectorMove.GetY();
+   float z = unitX.GetZ() * vectorMove.GetX() + unitY.GetZ() * vectorMove.GetY();
+   float w = unitX.GetW() * vectorMove.GetX() + unitY.GetW() * vectorMove.GetY();
 
-/**
- * @brief Mueve el robot hacia atrás
- *
- */
-void controllerEDAbot::moveBackward()
-{
-    setMotors(-controlValue, controlValue, controlValue, -controlValue);
-}
 
-/**
- * @brief Mueve el robot hacia su derecha
- *
- */
-void controllerEDAbot::moveRight()
-{
-    setMotors(-controlValue, -controlValue, controlValue, controlValue);
-}
-
-/**
- * @brief Mueve el robot hacia su izquierda
- *
- */
-void controllerEDAbot::moveLeft()
-{
-    setMotors(controlValue, controlValue, -controlValue, -controlValue);
+    if (!(vectorMove == Vector2Zero()))
+    {
+        setMotors(x/2, y/2, z/2, w/2);
+    }
+    else
+    {
+        setMotors(x, y, z, w);
+    }
 }
 
 /**
@@ -170,7 +163,6 @@ void controllerEDAbot::rotateLeft()
  */
 void controllerEDAbot::stop()
 {
-    setMotors(0.0f, 0.0f, 0.0f, 0.0f);        // Los cuatro motores de movimiento
     client->publishType(writingTopics[8], 0); // El dribbler
 }
 
@@ -326,10 +318,10 @@ void controllerEDAbot::setMotors(float motor1, float motor2, float motor3, float
 {
     int methodIndexShifter = controlMethod * 4;
 
-    client->publishType(writingTopics[methodIndexShifter++], motor1);
-    client->publishType(writingTopics[methodIndexShifter++], motor2);
-    client->publishType(writingTopics[methodIndexShifter++], motor3);
-    client->publishType(writingTopics[methodIndexShifter++], motor4);
+    client->publishType(writingTopics[methodIndexShifter++], motor1 * controlValue);
+    client->publishType(writingTopics[methodIndexShifter++], motor2 * controlValue);
+    client->publishType(writingTopics[methodIndexShifter++], motor3 * controlValue);
+    client->publishType(writingTopics[methodIndexShifter++], motor4 * controlValue);
 }
 
 /**

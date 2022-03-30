@@ -39,10 +39,7 @@ public:
 
     void update();
 
-    void moveForward();
-    void moveBackward();
-    void moveRight();
-    void moveLeft();
+    void moveRobot(raylib::Vector2 vectorMove);
     void rotateRight();
     void rotateLeft();
     void stop();
@@ -93,6 +90,10 @@ private:
     raylib::Vector3 rotation;
     raylib::Vector3 angularVelocity;
     // Actualmente, no implementado
+
+    //Vectores constantes para transformar el ingreso por teclado en movimientos a motores
+    const raylib::Vector4 unitX = { -1,-1,1,1 };
+    const raylib::Vector4 unitY = { 1,-1,-1,1 };
 
     void setMotors(float motor1, float motor2, float motor3, float motor4);
     void getData();

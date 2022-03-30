@@ -89,23 +89,13 @@ int main()
         // Manejo básico del display del EDABot
 
         // Detección de teclas con raylib
-        if (IsKeyDown(KEY_RIGHT))
-        {
-            control.moveRight();
-        }
-        else if (IsKeyDown(KEY_LEFT))
-        {
-            control.moveLeft();
-        }
-        else if (IsKeyDown(KEY_UP))
-        {
-            control.moveForward();
-        }
-        else if (IsKeyDown(KEY_DOWN))
-        {
-            control.moveBackward();
-        }
-        else if (IsKeyDown(KEY_D))
+        raylib::Vector2 keysVector = {(float)(IsKeyDown(KEY_RIGHT) -
+                                              IsKeyDown(KEY_LEFT)),
+                                      (float)(IsKeyDown(KEY_UP) -
+                                              IsKeyDown(KEY_DOWN))};
+        control.moveRobot(keysVector);
+        
+        if (IsKeyDown(KEY_D))
         {
             control.rotateRight();
         }
@@ -163,7 +153,8 @@ int main()
             // Modo de control de motores
 
             // Consumo
-            string consumptionString = "Power Consumption: " + to_string(control.getPowerConsumption());
+            string consumptionString = "Power Consumption: " +
+                                       to_string(control.getPowerConsumption());
             DrawText(consumptionString.data(), 0, 550, 20, GOLD);
             // Consumo
 
@@ -184,30 +175,32 @@ int main()
             // Información de motores.
             for (int i = 0; i < control.getMotorNum(); i++)
             {
-                string motorCurrentMsg = "Motor " +
-                                         to_string(i + 1) +
-                                         " current = " +
-                                         to_string(control.getMotorInfo()[i].current);
+                string parameterMsg;
 
-                string motorVoltageMsg = "Motor " +
-                                         to_string(i + 1) +
-                                         " voltage = " +
-                                         to_string(control.getMotorInfo()[i].voltage);
+                parameterMsg = "Motor " +
+                               to_string(i + 1) +
+                               " current = " +
+                               to_string(control.getMotorInfo()[i].current);
 
-                string motorRpmMsg = "Motor " +
-                                     to_string(i + 1) +
-                                     " rmp = " +
-                                     to_string(control.getMotorInfo()[i].rpm);
+                DrawText(parameterMsg.data(), 0, 0 + i * 90, 20, GOLD);
+
+                parameterMsg = "Motor " +
+                               to_string(i + 1) +
+                               " voltage = " +
+                               to_string(control.getMotorInfo()[i].voltage);
+                DrawText(parameterMsg.data(), 0, 20 + i * 90, 20, GOLD);
+
+                parameterMsg = "Motor " +
+                               to_string(i + 1) +
+                               " rmp = " +
+                               to_string(control.getMotorInfo()[i].rpm);
+                DrawText(parameterMsg.data(), 0, 40 + i * 90, 20, GOLD);
 
                 float temperature = control.getMotorInfo()[i].temperature;
-                string motorTemperatureMsg = "Motor " +
-                                             to_string(i + 1) +
-                                             " temperature = " +
-                                             to_string(temperature);
-
-                DrawText(motorCurrentMsg.data(), 0, 0 + i * 90, 20, GOLD);
-                DrawText(motorVoltageMsg.data(), 0, 20 + i * 90, 20, GOLD);
-                DrawText(motorRpmMsg.data(), 0, 40 + i * 90, 20, GOLD);
+                parameterMsg = "Motor " +
+                               to_string(i + 1) +
+                               " temperature = " +
+                               to_string(temperature);
 
                 // Aviso de temperatura peligrosa
                 //
@@ -216,11 +209,11 @@ int main()
                 static const float warningWindow = 5.0f;
                 if (temperature < control.getMaxTemperature() - warningWindow)
                 {
-                    DrawText(motorTemperatureMsg.data(), 0, 60 + i * 90, 20, GOLD);
+                    DrawText(parameterMsg.data(), 0, 60 + i * 90, 20, GOLD);
                 }
                 else
                 {
-                    DrawText(motorTemperatureMsg.data(), 0, 60 + i * 90, 20, RED);
+                    DrawText(parameterMsg.data(), 0, 60 + i * 90, 20, RED);
                 }
                 // Aviso de temperatura peligrosa
             }
