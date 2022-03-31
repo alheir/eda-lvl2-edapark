@@ -73,7 +73,7 @@ private:
     const float maxCurrent = 10.0f;
     const float maxVoltage = 24.0f;
     const float maxTemperature = 75.0f; // Valor empírico (a más de 80°C, se queman)
-    const float scaleRotation = 5.0f;
+    const float scaleRotation = 10.0f;
     const float dribblerVoltage = 1.0f;
     const int motorNum = 5;
 
@@ -84,16 +84,9 @@ private:
     float batteryLevel;
     float powerConsumption;
 
-    // Actualmente, no implementado
-    raylib::Vector3 position;
-    raylib::Vector3 velocity;
-    raylib::Vector3 rotation;
-    raylib::Vector3 angularVelocity;
-    // Actualmente, no implementado
-
-    //Vectores constantes para transformar el ingreso por teclado en movimientos a motores
-    const raylib::Vector4 unitX = { -1,-1,1,1 };
-    const raylib::Vector4 unitY = { 1,-1,-1,1 };
+    // Vectores constantes para transformar el ingreso por teclado en movimientos a motores
+    const raylib::Vector4 unitX = {-1, -1, 1, 1};
+    const raylib::Vector4 unitY = {1, -1, -1, 1};
 
     void setMotors(float motor1, float motor2, float motor3, float motor4);
     void getData();

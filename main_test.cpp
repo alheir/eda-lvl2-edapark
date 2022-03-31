@@ -36,6 +36,7 @@ int main()
     cout << "Desubscripción a todos los topics... ";
     if (!client.unsubscribe("robot1/+/+"))
         return fail();
+    pass();
 
     cout << "Resubscripción a todos los topics... ";
     if (!client.subscribe("robot1/+/+"))

@@ -104,28 +104,41 @@ void controllerEDAbot::update()
     checkTemperature();
 }
 
+/**
+ * @brief Recibe un vector cartesiano unitario y lo transforma en comandos a los motores
+ * de movimiento.
+ *
+ * @param raylib::Vector2 vectorMove Coordenadas (X,Y)
+ */
 void controllerEDAbot::moveRobot(raylib::Vector2 vectorMove)
 {
-   /*
-   *  (1,0) = (-1,-1,1,1)                   //Derecha
-   *  (0,1) = (1,-1,-1,1)                   //Adelante
-   *  (-1,0) = (1,1,-1,-1)                  //Izquierda
-   *  (0,-1) = (-1,1,1,-1)                  //Atrás
-   *  (1,1) = (1,0) + (0,1) = (0,-2,0,2)    //Derecha y adelante
-   *  (1,-1) = (1,0) - (0.1) = (-2,0,2,0)   //Derecha y atrás
-   *  (-1,-1) = -(1,0) - (0,1) = (0,2,0,-2) //Izquierda y atrás
-   *  (-1,1) = -(1,0) + (0,1) = (2,0,-2,0)  //Izquierda y adelante 
-   *
-   */
-   float x = unitX.GetX() * vectorMove.GetX() + unitY.GetX()* vectorMove.GetY();
-   float y = unitX.GetY() * vectorMove.GetX() + unitY.GetY() * vectorMove.GetY();
-   float z = unitX.GetZ() * vectorMove.GetX() + unitY.GetZ() * vectorMove.GetY();
-   float w = unitX.GetW() * vectorMove.GetX() + unitY.GetW() * vectorMove.GetY();
 
+    /*  Se toma el vector recibido y se lo transforma en coordenadas a los motores
+     *  a partir de las coordenadas ya transformadas de lo casos (1,0) y (0,1).
+     *
+     *  (1,-1) equivale a "abajo a la derecha", que se asocia con (-1,0,1,0), indicando cada
+     *  posición el sentido de giro de los motores, correspondientemente.
+     *
+     *  (1,0)   =                       (-1,-1,1,1) Derecha
+     *  (0,1)   =                       (1,-1,-1,1) Adelante
+     *  (-1,0)  =   -(1,0)              (1,1,-1,-1) Izquierda
+     *  (0,-1)  =   -(0,1)          =   (-1,1,1,-1) Atrás
+     *  (1,1)   =   (1,0) + (0,1)   =   (0,-2,0,2)  Derecha y adelante
+     *  (1,-1)  =   (1,0) - (0.1)   =   (-2,0,2,0)  Derecha y atrás
+     *  (-1,-1) =   -(1,0) - (0,1)  =   (0,2,0,-2)  Izquierda y atrás
+     *  (-1,1)  =   -(1,0) + (0,1)  =   (2,0,-2,0)  Izquierda y adelante
+     *
+     */
 
-    if (!(vectorMove == Vector2Zero()))
+    float x = unitX.GetX() * vectorMove.GetX() + unitY.GetX() * vectorMove.GetY();
+    float y = unitX.GetY() * vectorMove.GetX() + unitY.GetY() * vectorMove.GetY();
+    float z = unitX.GetZ() * vectorMove.GetX() + unitY.GetZ() * vectorMove.GetY();
+    float w = unitX.GetW() * vectorMove.GetX() + unitY.GetW() * vectorMove.GetY();
+
+    // Se divide por 2 en donde la suma de los vectores transformados da 2 en módulo
+    if (vectorMove.GetX() != 0.0f && vectorMove.GetY() != 0.0f)
     {
-        setMotors(x/2, y/2, z/2, w/2);
+        setMotors(x / 2, y / 2, z / 2, w / 2);
     }
     else
     {

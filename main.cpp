@@ -36,9 +36,13 @@ int main()
 
     SetTargetFPS(60);
 
-    // Paquete RGB a mandarle al display ("sin mucho esfuerzo")
+    // Paquete RGB a mandarle al display
+    // Implementado primitivamente, por lo que necesariamente quedó definido aquí
     std::vector<char> displayMsg;
     displayMsg.resize(768);
+
+    bool isLEDOn = false;
+    bool shouldLCDBeOn = true; // Función del teclado de raylib
 
     while (!window.ShouldClose())
     {
@@ -47,8 +51,7 @@ int main()
         // Marc's code for blinking EDABot eyes
         double time = GetTime();
         double period = time - (long)time;
-        static bool isLEDOn = false;
-        bool shouldEyesBeOn = (period < 0.1);
+        static bool shouldEyesBeOn = (period < 0.1);
         if (isLEDOn != shouldEyesBeOn)
         {
             char redColor = shouldEyesBeOn ? 0xff : 0;
@@ -61,7 +64,6 @@ int main()
 
         // Manejo básico del display del EDABot
         // (escala de grises y dividido en 3 franjas)
-        static bool shouldLCDBeOn = false;
         bool shouldLCDChangeColor = (period < 0.9);
         if (!shouldLCDBeOn)
         {
@@ -88,13 +90,14 @@ int main()
         }
         // Manejo básico del display del EDABot
 
-        // Detección de teclas con raylib
+        // Envío de teclas de dirección en formato de coordenadas cartesianas (X,Y).
+        // "Apretar UP y RIGHT causa (1, 1)"
         raylib::Vector2 keysVector = {(float)(IsKeyDown(KEY_RIGHT) -
                                               IsKeyDown(KEY_LEFT)),
                                       (float)(IsKeyDown(KEY_UP) -
                                               IsKeyDown(KEY_DOWN))};
         control.moveRobot(keysVector);
-        
+
         if (IsKeyDown(KEY_D))
         {
             control.rotateRight();
