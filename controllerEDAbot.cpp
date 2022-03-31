@@ -171,7 +171,7 @@ void controllerEDAbot::rotateLeft()
 }
 
 /**
- * @brief Detiene todos los motores
+ * @brief Detiene el dribbler
  *
  */
 void controllerEDAbot::stop()
